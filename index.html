@@ -14,7 +14,7 @@
     --navy: #1e3a8a;
     --quote-grad-start: #3b5998;
     --quote-grad-end: #5a8dee;
-    --point-blue: #2b7bd6;
+    --glass-border: rgba(255,255,255,0.36);
   }
   html,body{height:100%;margin:0;font-family:Roboto,system-ui,-apple-system,"Segoe UI",Arial;}
   body{
@@ -38,7 +38,18 @@
   .draw-area{display:flex;flex-direction:column;gap:12px;align-items:center}
 
   /* PREVIEW */
-  .preview{width:100%;height:200px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.88));border:1px solid rgba(30,58,138,0.04);overflow:hidden;position:relative}
+  .preview{
+    width:100%;
+    height:200px;
+    border-radius:12px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(255,255,255,0.88));
+    border:1px solid rgba(30,58,138,0.04);
+    overflow:hidden;
+    position:relative;
+  }
   .preview img{max-width:70%;max-height:80%;object-fit:contain;border-radius:8px;transition:transform .3s ease,filter .45s ease;display:block;margin:auto}
   .preview img.dimmed{filter:brightness(0.35) grayscale(0.15)}
   .preview .placeholder{font-weight:700;color:var(--navy);text-align:center;padding:12px}
@@ -67,25 +78,77 @@
   .tiny{font-size:12px;font-weight:700;color:rgba(5,32,63,0.7)}
   .book-area{margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center}
 
-  /* MODAL */
-  .modal-backdrop{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:2000;padding:14px;background:rgba(0,0,0,0.45)}
+  /* MODAL: backdrop is TRANSPARENT (no darkening) */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index:2000;
+    padding:14px;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
   .modal-backdrop.show{display:flex}
+
+  /* GLASS MODAL */
   .modal{
-    width:100%;
+    width:92vw; /* mniejsze na telefonach i tabletach */
     max-width:560px;
-    background:#fff;
+    background: rgba(255,255,255,0.08); /* delikatne "szkło" na desktop */
+    border: 1px solid var(--glass-border);
     border-radius:14px;
-    padding:0;
-    box-shadow:0 20px 40px rgba(6,21,52,0.16);
-    border:1px solid rgba(30,58,138,0.06);
-    overflow:visible;
+    box-shadow:
+      0 12px 28px rgba(6,21,52,0.12),
+      inset 0 1px 0 rgba(255,255,255,0.6);
+    backdrop-filter: blur(30px) saturate(120%);
+    -webkit-backdrop-filter: blur(30px) saturate(120%);
     position:relative;
-    max-height: calc(100vh - 40px); /* important for mobile */
+    overflow:visible;
+    max-height: calc(100vh - 40px);
     display:flex;
     flex-direction:column;
+    transition: background .22s ease, box-shadow .22s ease, border .22s ease, transform .12s ease;
+    margin: 0 auto;
   }
   .modal.has-side-scrollbar{padding-right:72px;}
-  .modal-inner{padding:14px}
+
+  /* corner glows */
+  .modal::before,
+  .modal::after{
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    z-index: 6;
+    border-radius: inherit;
+    mix-blend-mode: screen;
+  }
+  .modal::before{
+    top: -12px;
+    left: -12px;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle at 20% 20%,
+                rgba(255,255,255,0.40) 0%,
+                rgba(255,255,255,0.10) 36%,
+                rgba(255,255,255,0.00) 60%);
+    filter: blur(10px);
+  }
+  .modal::after{
+    right: -14px;
+    bottom: -14px;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(circle at 80% 80%,
+                rgba(255,255,255,0.30) 0%,
+                rgba(255,255,255,0.06) 32%,
+                rgba(255,255,255,0.00) 62%);
+    filter: blur(14px);
+  }
+
+  .modal-inner{padding:14px; position: relative; z-index: 10; background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius: 12px;}
   .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
   .modal-title{font-family:Pacifico;color:var(--navy);font-size:22px;margin:0}
   .modal-hint{font-size:13px;color:rgba(5,32,63,0.8);margin-top:6px;font-weight:700;text-align:center}
@@ -97,7 +160,6 @@
   .mission-badge{font-size:18px;margin-left:4px}
   .mission-small{font-size:12px;color:rgba(5,32,63,0.65);margin-top:2px}
 
-  /* progress inside mission */
   .mission .progress-wrap{width:160px;background:linear-gradient(90deg,#f1f6ff,#ffffff);border-radius:999px;padding:6px;box-sizing:border-box;border:1px solid rgba(30,58,138,0.04)}
   .mission .progress-bar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));width:0%;transition:width .5s ease}
   .mission .progress-row{display:flex;align-items:center;gap:8px}
@@ -105,22 +167,24 @@
 
   .close{border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--navy)}
 
+  /* modal body */
   .modal-body{
     width:100%;
     overflow-y:auto;
     overflow-x:hidden;
     padding:12px 18px 18px 18px;
-    background:linear-gradient(180deg,rgba(255,255,255,0.98),rgba(247,251,255,0.98));
+    background: rgba(255,255,255,0.01);
     box-sizing:border-box;
     scroll-behavior:smooth;
     scrollbar-width: none;
     -ms-overflow-style: none;
-    flex:1; /* makes body take available vertical space inside modal */
-    min-height:0; /* prevents flex overflow issues on mobile */
+    flex:1;
+    min-height:0;
+    position:relative;
   }
   .modal-body::-webkit-scrollbar{display:none}
 
-  /* GRID OF ITEMS: switch to CSS Grid for reliable responsive layout */
+  /* GRID OF ITEMS */
   .grid{
     display:grid;
     grid-template-columns: repeat(2, 1fr);
@@ -144,13 +208,13 @@
     gap:8px;
     padding:10px;
     overflow:visible;
-    min-width:0; /* prevents flex/grid overflow on small screens */
+    min-width:0;
     text-align:center;
   }
   .imgWrap{
     width:100%;
     aspect-ratio:1/1;
-    max-width:220px; /* avoids images growing too large on wide screens */
+    max-width:220px;
     position:relative;
     overflow:hidden;
     border-radius:8px;
@@ -169,32 +233,58 @@
   .cardItem .name{font-weight:900;color:var(--navy);text-align:center;font-size:14px;margin-top:6px;word-break:break-word}
   .cardItem .desc{font-size:12px;color:rgba(5,32,63,0.8);text-align:center;padding:6px 4px;word-break:break-word}
 
+  /* SIDE SCROLLBAR styled to be light (desktop) */
   .side-scrollbar{position:absolute;right:16px;z-index:2200;pointer-events:auto;display:flex;align-items:flex-start;justify-content:center}
-  .side-scrollbar .track{width:8px;border-radius:6px;background:rgba(5,32,63,0.06);position:relative;height:100%;box-sizing:border-box;padding:4px 0}
-  .side-scrollbar .thumb{position:absolute;left:50%;transform:translateX(-50%);width:28px;border-radius:20px;height:48px;background:#fff;border:3px solid var(--quote-grad-start);box-shadow:0 4px 10px rgba(6,21,52,0.12);cursor:pointer;touch-action:none;box-sizing:border-box}
+  .side-scrollbar .track{width:8px;border-radius:6px;background:rgba(255,255,255,0.06);position:relative;height:100%;box-sizing:border-box;padding:4px 0}
+  .side-scrollbar .thumb{position:absolute;left:50%;transform:translateX(-50%);width:28px;border-radius:20px;height:48px;background:rgba(255,255,255,0.92);border:3px solid rgba(255,255,255,0.65);box-shadow:0 4px 12px rgba(6,21,52,0.08);cursor:pointer;touch-action:none;box-sizing:border-box}
   .side-scrollbar[aria-hidden="true"]{display:none}
+
+  /* MOBILE SCROLL INDICATOR (replaces side scrollbar on mobile) */
+  .mobile-scroll-indicator{display:none} /* shown only on mobile by media query */
+  .mobile-scroll-indicator .fill{width:0%;height:100%;transition:width .12s linear;background:rgba(255,255,255,0.95);border-radius:3px}
 
   /* MOBILE ADJUSTMENTS */
   @media (max-width:420px){
-    .modal{max-width:100%; margin:8px; padding-right:8px; border-radius:12px;}
+    .modal{max-width:92vw; margin:8px auto; padding-right:8px; border-radius:12px; background: rgba(255,255,255,0.14); backdrop-filter: blur(28px) saturate(120%); -webkit-backdrop-filter: blur(28px) saturate(120%);}
     .side-scrollbar{display:none}
     .preview{height:140px}
     .preview img{max-width:70%}
     .countdown-card{padding:8px;flex:1 1 100%}
     .countdown-value{font-size:16px}
     .cardItem{padding:8px}
-    .imgWrap{padding:4px; max-width:180px}
+    .imgWrap{padding:4px; max-width:160px}
     .cardItem .name{font-size:13px}
     .cardItem .desc{font-size:11px}
     .mission{align-items:flex-start;min-width:0}
     .modal-header{gap:8px}
     .controls{flex-direction:column;align-items:stretch}
     .controls .btn{width:100%}
-    /* one column grid on small screens to avoid overlap */
     .grid{grid-template-columns: 1fr; gap:12px; padding:6px;}
-    /* ensure modal body respects viewport on tiny devices */
     .modal{max-height: calc(100vh - 24px);}
     .modal-body{padding-bottom:28px;}
+    /* show the small mobile scroll indicator in top-right of modal body */
+    .mobile-scroll-indicator{
+      display:block;
+      position:absolute;
+      right:12px;
+      top:12px;
+      height:6px;
+      width:64px;
+      background: rgba(255,255,255,0.08);
+      border-radius:4px;
+      overflow:hidden;
+      z-index:30;
+      pointer-events:none;
+    }
+    .mobile-scroll-indicator .fill{height:100%; width:0%; background: rgba(255,255,255,0.95); border-radius:3px}
+  }
+
+  /* fallback dla przeglądarek bez backdrop-filter */
+  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+    .modal{
+      background: rgba(255,255,255,0.14);
+      box-shadow: 0 14px 30px rgba(6,21,52,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
+    }
   }
 
   /* small helper to avoid image overflow inside preview / items */
@@ -235,14 +325,14 @@
           </div>
         </div>
       </div>
-<div class="book-area">
+      <div class="book-area">
         <button id="openBook" class="btn book" style="width:100%;"><span class="icon">📖</span>Księga Czekoladek</button>
       </div>
     </section>
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document">
+    <div class="modal" role="document" id="modalRoot">
       <div class="modal-inner">
         <div class="modal-header">
           <div style="flex:1;min-width:0">
@@ -268,6 +358,9 @@
         </div>
       </div>
 
+      <!-- mobile scroll indicator (visible only on small screens) -->
+      <div class="mobile-scroll-indicator" id="mobileScrollIndicator" aria-hidden="true"><div class="fill" id="mobileScrollFill"></div></div>
+
       <div class="modal-body" id="modalBody" aria-live="polite">
         <!-- grid wypełniany przez JS -->
       </div>
@@ -283,9 +376,7 @@
   </div>
 
 <script>
-// ... zachowałem Twój oryginalny JS bez zmian (wklejony niżej) ...
-// DUŻA POPRAWA: cały krytyczny kod JS jest defensywny (try/catch) — nawet jeśli localStorage jest uszkodzony
-// lub jakiś element DOM braknie, reszta aplikacji nadal działa.
+// ORYGINALNY JS — rozszerzony o mobile scroll indicator i drobne zachowania mobilne
 (function(){
 try{
   const ITEMS_COUNT = 17;
@@ -309,6 +400,8 @@ try{
   const track = document.getElementById('scrollTrack');
   const thumb = document.getElementById('scrollThumb');
   const previewEl = document.getElementById('preview');
+  const mobileIndicator = document.getElementById('mobileScrollIndicator');
+  const mobileFill = document.getElementById('mobileScrollFill');
 
   // safe localStorage helpers
   function safeGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
@@ -435,11 +528,54 @@ try{
   // progress
   function updateProgress(){ try{ const found = discovered.filter(Boolean).length; const pct = Math.round((found / ITEMS_COUNT) * 100); const bar = document.getElementById('progressBar'); const pctEl = document.getElementById('progressPct'); const foundEl = document.getElementById('foundCount'); if(bar) bar.style.width = pct + '%'; if(pctEl) pctEl.textContent = pct + '%'; if(foundEl) foundEl.textContent = found; if(bar) bar.setAttribute('aria-valuenow', String(pct)); }catch(e){/*silent*/} }
 
-  // custom scrollbar
+  // custom scrollbar + mobile indicator
   function positionSidebar(){ try{ if(!verticalScrollbar) return; const parentModal = verticalScrollbar.parentElement; const modalRect = parentModal.getBoundingClientRect(); const bodyRect = modalBody.getBoundingClientRect(); const top = bodyRect.top - modalRect.top; const height = modalBody.clientHeight; verticalScrollbar.style.top = Math.max(8, top) + 'px'; verticalScrollbar.style.height = (height) + 'px'; }catch(e){} }
-  function updateSideScrollbar(){ try{ if(!modalBody || !track || !thumb || !verticalScrollbar || !modal) return; positionSidebar(); const contentH = modalBody.scrollHeight; const visibleH = modalBody.clientHeight; const trackH = track.clientHeight; const maxScroll = Math.max(0, contentH - visibleH); if(maxScroll <= 0){ verticalScrollbar.setAttribute('aria-hidden','true'); modal.classList.remove('has-side-scrollbar'); return; } verticalScrollbar.setAttribute('aria-hidden','false'); modal.classList.add('has-side-scrollbar'); const thumbH = Math.max(40, Math.round((visibleH / contentH) * trackH)); const maxThumbTop = trackH - thumbH; const pct = modalBody.scrollTop / maxScroll; const top = Math.round(pct * maxThumbTop); thumb.style.height = thumbH + 'px'; thumb.style.top = top + 'px'; }catch(e){} }
-  
-  // track click
+  function updateSideScrollbar(){ try{
+    if(!modalBody || !track || !thumb || !verticalScrollbar || !modal) return;
+    positionSidebar();
+    const contentH = modalBody.scrollHeight;
+    const visibleH = modalBody.clientHeight;
+    const trackH = track.clientHeight;
+    const maxScroll = Math.max(0, contentH - visibleH);
+    if(maxScroll <= 0){
+      verticalScrollbar.setAttribute('aria-hidden','true');
+      modal.classList.remove('has-side-scrollbar');
+    } else {
+      verticalScrollbar.setAttribute('aria-hidden','false');
+      modal.classList.add('has-side-scrollbar');
+      const thumbH = Math.max(40, Math.round((visibleH / contentH) * trackH));
+      const maxThumbTop = trackH - thumbH;
+      const pct = modalBody.scrollTop / maxScroll;
+      const top = Math.round(pct * maxThumbTop);
+      thumb.style.height = thumbH + 'px';
+      thumb.style.top = top + 'px';
+    }
+    // always update mobile indicator too (it will hide itself if not mobile)
+    updateMobileScrollIndicator();
+  }catch(e){console.error(e)} }
+
+  // mobile scroll indicator: small top-right fill showing scroll position (visible only on narrow screens)
+  function updateMobileScrollIndicator(){
+    try{
+      if(!mobileIndicator || !mobileFill || !modalBody) return;
+      const isMobile = window.innerWidth <= 420;
+      if(!isMobile){ mobileIndicator.setAttribute('aria-hidden','true'); mobileIndicator.style.display = 'none'; return; }
+      const contentH = modalBody.scrollHeight;
+      const visibleH = modalBody.clientHeight;
+      const maxScroll = Math.max(0, contentH - visibleH);
+      if(maxScroll <= 0){
+        mobileIndicator.setAttribute('aria-hidden','true');
+        mobileIndicator.style.display = 'none';
+        return;
+      }
+      mobileIndicator.setAttribute('aria-hidden','false');
+      mobileIndicator.style.display = 'block';
+      const pct = Math.min(1, modalBody.scrollTop / maxScroll);
+      mobileFill.style.width = `${Math.round(pct * 100)}%`;
+    }catch(e){}
+  }
+
+  // track click (desktop)
   if(track){ track.addEventListener('click', (e)=>{ try{ if(e.target === thumb) return; const rect = track.getBoundingClientRect(); const clickY = e.clientY - rect.top; const thumbH = thumb.clientHeight || 40; const maxTop = track.clientHeight - thumbH; const newTop = Math.min(Math.max(0, clickY - thumbH/2), maxTop); const pct = newTop / (maxTop || 1); modalBody.scrollTop = Math.round(pct * (modalBody.scrollHeight - modalBody.clientHeight)); updateSideScrollbar(); }catch(e){} }); }
 
   // thumb drag
@@ -448,13 +584,20 @@ try{
   function onThumbUp(){ dragging=false; document.removeEventListener('pointermove', onThumbMove); document.removeEventListener('pointerup', onThumbUp); }
   if(thumb){ thumb.addEventListener('pointerdown', (e)=>{ dragging=true; dragStartY=e.clientY; startTop = parseInt(thumb.style.top || '0',10) || 0; thumb.setPointerCapture && thumb.setPointerCapture(e.pointerId); document.addEventListener('pointermove', onThumbMove); document.addEventListener('pointerup', onThumbUp); e.preventDefault(); }); thumb.addEventListener('keydown', (e)=>{ if(e.key==='ArrowDown') modalBody.scrollBy({top:40,behavior:'smooth'}); if(e.key==='ArrowUp') modalBody.scrollBy({top:-40,behavior:'smooth'}); if(e.key==='PageDown') modalBody.scrollBy({top: modalBody.clientHeight, behavior:'smooth'}); if(e.key==='PageUp') modalBody.scrollBy({top:-modalBody.clientHeight,behavior:'smooth'}); }); }
 
-  if(modalBody){ modalBody.addEventListener('scroll', () => { if (typeof window.__sideTimer !== 'undefined') clearTimeout(window.__sideTimer); window.__sideTimer = setTimeout(()=>{ updateSideScrollbar(); }, 30); }); }
+  if(modalBody){
+    modalBody.addEventListener('scroll', () => {
+      if (typeof window.__sideTimer !== 'undefined') clearTimeout(window.__sideTimer);
+      window.__sideTimer = setTimeout(()=>{ updateSideScrollbar(); }, 30);
+      // update mobile indicator immediately for snappiness
+      updateMobileScrollIndicator();
+    });
+  }
 
-  window.addEventListener('resize', ()=>{ positionSidebar(); updateSideScrollbar(); });
+  window.addEventListener('resize', ()=>{ positionSidebar(); updateSideScrollbar(); updateMobileScrollIndicator(); });
 
   // events
   if(drawBtn){ drawBtn.addEventListener('click', ()=>{ try{ if(secondsUntilNextDraw()>0){ updateDrawCooldownUI(); return; } startShuffle(1400); }catch(e){} }); }
-  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); setTimeout(()=>{ positionSidebar(); updateSideScrollbar(); }, 80); } }catch(e){} }); }
+  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); setTimeout(()=>{ positionSidebar(); updateSideScrollbar(); updateMobileScrollIndicator(); }, 80); } }catch(e){} }); }
   if(closeModal){ closeModal.addEventListener('click', ()=>{ if(modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); }
   if(modalBackdrop){ modalBackdrop.addEventListener('click',(e)=>{ if(e.target===modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); }
 
@@ -473,7 +616,7 @@ try{
       updateDec24(); updateDrawCooldownUI(); setInterval(updateDec24,1000); setInterval(updateDrawCooldownUI,1000);
       if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length;
       updateProgress();
-      setTimeout(()=>{ positionSidebar(); updateSideScrollbar(); }, 120);
+      setTimeout(()=>{ positionSidebar(); updateSideScrollbar(); updateMobileScrollIndicator(); }, 120);
     }catch(e){ console.error('init error', e); }
   })();
 
@@ -485,4 +628,5 @@ try{
 </script>
 </body>
 </html>
+
 
