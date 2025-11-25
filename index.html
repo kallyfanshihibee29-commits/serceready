@@ -87,21 +87,22 @@
     justify-content:center;
     z-index:2000;
     padding:14px;
-    background: transparent;
-    backdrop-filter: none;
+    background: transparent; /* <-- brak przyciemnienia */
+    backdrop-filter: none; /* <-- brak rozmycia/przyciemnienia całego tła */
     -webkit-backdrop-filter: none;
   }
   .modal-backdrop.show{display:flex}
 
   /* GLASS MODAL */
   .modal{
-    width:92vw; /* mniejsze na telefonach i tabletach */
+    width:100%;
     max-width:560px;
-    background: rgba(255,255,255,0.08); /* delikatne "szkło" na desktop */
+    background: rgba(255,255,255,0.06); /* bardzo przezroczyste, jasne szkło */
     border: 1px solid var(--glass-border);
     border-radius:14px;
+    /* lżejszy cień, bez silnego przyciemnienia */
     box-shadow:
-      0 12px 28px rgba(6,21,52,0.12),
+      0 8px 24px rgba(6,21,52,0.10),
       inset 0 1px 0 rgba(255,255,255,0.6);
     backdrop-filter: blur(30px) saturate(120%);
     -webkit-backdrop-filter: blur(30px) saturate(120%);
@@ -110,48 +111,12 @@
     max-height: calc(100vh - 40px);
     display:flex;
     flex-direction:column;
-    transition: background .22s ease, box-shadow .22s ease, border .22s ease, transform .12s ease;
-    margin: 0 auto;
-  }
-  .modal.has-side-scrollbar{padding-right:72px;}
-
-  /* corner glows */
-  .modal::before,
-  .modal::after{
-    content: "";
-    position: absolute;
-    pointer-events: none;
-    z-index: 6;
-    border-radius: inherit;
-    mix-blend-mode: screen;
-  }
-  .modal::before{
-    top: -12px;
-    left: -12px;
-    width: 100px;
-    height: 100px;
-    background: radial-gradient(circle at 20% 20%,
-                rgba(255,255,255,0.40) 0%,
-                rgba(255,255,255,0.10) 36%,
-                rgba(255,255,255,0.00) 60%);
-    filter: blur(10px);
-  }
-  .modal::after{
-    right: -14px;
-    bottom: -14px;
-    width: 120px;
-    height: 120px;
-    background: radial-gradient(circle at 80% 80%,
-                rgba(255,255,255,0.30) 0%,
-                rgba(255,255,255,0.06) 32%,
-                rgba(255,255,255,0.00) 62%);
-    filter: blur(14px);
+    transition: background .22s ease, box-shadow .22s ease, border .22s ease;
   }
 
-  .modal-inner{padding:14px; position: relative; z-index: 10; background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); border-radius: 12px;}
+  .modal-inner{padding:14px; position: relative; z-index: 10; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius: 12px;}
   .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
   .modal-title{font-family:Pacifico;color:var(--navy);font-size:22px;margin:0}
-  .modal-hint{font-size:13px;color:rgba(5,32,63,0.8);margin-top:6px;font-weight:700;text-align:center}
 
   .mission{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
   .mission-title{font-weight:700;font-size:13px;color:var(--navy)}
@@ -160,14 +125,9 @@
   .mission-badge{font-size:18px;margin-left:4px}
   .mission-small{font-size:12px;color:rgba(5,32,63,0.65);margin-top:2px}
 
-  .mission .progress-wrap{width:160px;background:linear-gradient(90deg,#f1f6ff,#ffffff);border-radius:999px;padding:6px;box-sizing:border-box;border:1px solid rgba(30,58,138,0.04)}
-  .mission .progress-bar{height:10px;border-radius:999px;background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));width:0%;transition:width .5s ease}
-  .mission .progress-row{display:flex;align-items:center;gap:8px}
-  .progress-percent{font-weight:900;font-size:13px;color:var(--navy);padding:4px 8px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.9),rgba(255,255,255,0.7));box-shadow:0 4px 10px rgba(6,21,52,0.06)}
-
   .close{border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--navy)}
 
-  /* modal body */
+  /* modal body stays scrollable; neutral/light background so content is czytelny */
   .modal-body{
     width:100%;
     overflow-y:auto;
@@ -176,13 +136,11 @@
     background: rgba(255,255,255,0.01);
     box-sizing:border-box;
     scroll-behavior:smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    scrollbar-width: auto; /* allow native scrolling */
+    -ms-overflow-style: auto;
     flex:1;
     min-height:0;
-    position:relative;
   }
-  .modal-body::-webkit-scrollbar{display:none}
 
   /* GRID OF ITEMS */
   .grid{
@@ -233,58 +191,24 @@
   .cardItem .name{font-weight:900;color:var(--navy);text-align:center;font-size:14px;margin-top:6px;word-break:break-word}
   .cardItem .desc{font-size:12px;color:rgba(5,32,63,0.8);text-align:center;padding:6px 4px;word-break:break-word}
 
-  /* SIDE SCROLLBAR styled to be light (desktop) */
-  .side-scrollbar{position:absolute;right:16px;z-index:2200;pointer-events:auto;display:flex;align-items:flex-start;justify-content:center}
-  .side-scrollbar .track{width:8px;border-radius:6px;background:rgba(255,255,255,0.06);position:relative;height:100%;box-sizing:border-box;padding:4px 0}
-  .side-scrollbar .thumb{position:absolute;left:50%;transform:translateX(-50%);width:28px;border-radius:20px;height:48px;background:rgba(255,255,255,0.92);border:3px solid rgba(255,255,255,0.65);box-shadow:0 4px 12px rgba(6,21,52,0.08);cursor:pointer;touch-action:none;box-sizing:border-box}
-  .side-scrollbar[aria-hidden="true"]{display:none}
-
-  /* MOBILE SCROLL INDICATOR (replaces side scrollbar on mobile) */
-  .mobile-scroll-indicator{display:none} /* shown only on mobile by media query */
-  .mobile-scroll-indicator .fill{width:0%;height:100%;transition:width .12s linear;background:rgba(255,255,255,0.95);border-radius:3px}
-
-  /* MOBILE ADJUSTMENTS */
+  /* MOBILE ADJUSTMENTS: keep two columns on small screens */
   @media (max-width:420px){
-    .modal{max-width:92vw; margin:8px auto; padding-right:8px; border-radius:12px; background: rgba(255,255,255,0.14); backdrop-filter: blur(28px) saturate(120%); -webkit-backdrop-filter: blur(28px) saturate(120%);}
-    .side-scrollbar{display:none}
+    .modal{max-width:100%; margin:8px; padding-right:8px; border-radius:12px;}
     .preview{height:140px}
     .preview img{max-width:70%}
     .countdown-card{padding:8px;flex:1 1 100%}
     .countdown-value{font-size:16px}
     .cardItem{padding:8px}
-    .imgWrap{padding:4px; max-width:160px}
+    .imgWrap{padding:4px; max-width:180px}
     .cardItem .name{font-size:13px}
     .cardItem .desc{font-size:11px}
     .mission{align-items:flex-start;min-width:0}
     .modal-header{gap:8px}
     .controls{flex-direction:column;align-items:stretch}
     .controls .btn{width:100%}
-    .grid{grid-template-columns: 1fr; gap:12px; padding:6px;}
+    .grid{grid-template-columns: repeat(2, 1fr); gap:12px; padding:6px;}
     .modal{max-height: calc(100vh - 24px);}
     .modal-body{padding-bottom:28px;}
-    /* show the small mobile scroll indicator in top-right of modal body */
-    .mobile-scroll-indicator{
-      display:block;
-      position:absolute;
-      right:12px;
-      top:12px;
-      height:6px;
-      width:64px;
-      background: rgba(255,255,255,0.08);
-      border-radius:4px;
-      overflow:hidden;
-      z-index:30;
-      pointer-events:none;
-    }
-    .mobile-scroll-indicator .fill{height:100%; width:0%; background: rgba(255,255,255,0.95); border-radius:3px}
-  }
-
-  /* fallback dla przeglądarek bez backdrop-filter */
-  @supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-    .modal{
-      background: rgba(255,255,255,0.14);
-      box-shadow: 0 14px 30px rgba(6,21,52,0.18), inset 0 1px 0 rgba(255,255,255,0.6);
-    }
   }
 
   /* small helper to avoid image overflow inside preview / items */
@@ -332,13 +256,10 @@
   </div>
 
   <div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document" id="modalRoot">
+    <div class="modal" role="document">
       <div class="modal-inner">
         <div class="modal-header">
-          <div style="flex:1;min-width:0">
-            <h3 class="modal-title">Księga Czekoladek</h3>
-            <div class="modal-hint">Przesuń w dół, aby zobaczyć inne czekoladki</div>
-          </div>
+          <!-- removed title/hint per request -->
           <div style="display:flex;gap:10px;align-items:center;">
             <div class="mission" style="min-width:150px;">
               <div class="mission-title">Zdobądź wszystkie</div>
@@ -346,29 +267,14 @@
                 <div class="mission-count"><span id="foundCount">0</span>/17</div>
                 <div class="mission-badge" aria-hidden="true">🎁</div>
               </div>
-              <div class="progress-row" style="margin-top:6px;display:flex;align-items:center;gap:8px;">
-                <div class="progress-wrap" aria-hidden="true">
-                  <div class="progress-bar" id="progressBar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></div>
-                </div>
-                <div class="progress-percent" id="progressPct" aria-hidden="true">0%</div>
-              </div>
             </div>
             <button class="close" id="closeModal" aria-label="Zamknij">✕</button>
           </div>
         </div>
       </div>
 
-      <!-- mobile scroll indicator (visible only on small screens) -->
-      <div class="mobile-scroll-indicator" id="mobileScrollIndicator" aria-hidden="true"><div class="fill" id="mobileScrollFill"></div></div>
-
       <div class="modal-body" id="modalBody" aria-live="polite">
         <!-- grid wypełniany przez JS -->
-      </div>
-
-      <div class="side-scrollbar" id="sideScrollbar" aria-hidden="false">
-        <div class="track" id="scrollTrack" aria-hidden="true">
-          <div class="thumb" id="scrollThumb" tabindex="0" role="scrollbar" aria-label="Pasek przewijania czekoladek"></div>
-        </div>
       </div>
 
       <div class="modal-inner" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -376,7 +282,8 @@
   </div>
 
 <script>
-// ORYGINALNY JS — rozszerzony o mobile scroll indicator i drobne zachowania mobilne
+// ZMIANY: usuń checkbox powtórek, zawsze dozwolone powtórki; usuń niestandardowy pasek przewijania —
+// obsługa przewijania odbywa się teraz natywnie (mysz/palec). Zmniejszono i uproszczono kod.
 (function(){
 try{
   const ITEMS_COUNT = 17;
@@ -396,12 +303,7 @@ try{
   const modalBody = document.getElementById('modalBody');
   const closeModal = document.getElementById('closeModal');
   const foundCountEl = document.getElementById('foundCount');
-  const verticalScrollbar = document.getElementById('sideScrollbar');
-  const track = document.getElementById('scrollTrack');
-  const thumb = document.getElementById('scrollThumb');
   const previewEl = document.getElementById('preview');
-  const mobileIndicator = document.getElementById('mobileScrollIndicator');
-  const mobileFill = document.getElementById('mobileScrollFill');
 
   // safe localStorage helpers
   function safeGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
@@ -466,13 +368,15 @@ try{
     shuffleInterval = setInterval(()=>{ const r=randomInt(ITEMS_COUNT); showImage(r); if(centralImg) centralImg.style.transform = `scale(${1+Math.random()*0.03}) rotate(${(Math.random()-0.5)*5}deg)`; }, 70);
 
     setTimeout(()=>{
-      clearInterval(shuffleInterval); shuffleInterval=null; const final=randomInt(ITEMS_COUNT);
+      clearInterval(shuffleInterval); shuffleInterval=null; // WYBIERAMY LOSOWO Z CAŁEGO ZAKRESU — powtórki zawsze możliwe
+      const final=randomInt(ITEMS_COUNT);
       showImage(final); if(centralImg) centralImg.style.transform='scale(1) rotate(0deg)'; if(centralImg) centralImg.classList.add('dimmed'); if(previewEl) previewEl.classList.add('show-overlay'); if(captionEl) captionEl.textContent='...';
 
       const REVEAL_DELAY=700;
       setTimeout(()=>{ 
         if(previewEl) previewEl.classList.remove('show-overlay'); if(centralImg) centralImg.classList.remove('dimmed');
         if(captionEl) captionEl.textContent = captions[final] || '';
+        // jeżeli już odkryte — zostanie normalnie pokazane (powtórki są dozwolone)
         if(!discovered[final]){ discovered[final]=true; saveDiscovered(); renderGrid(); }
         lastDraw = new Date(); lastIndex = final; saveLastDraw(lastDraw); saveLastIndex(final); updateDrawCooldownUI(); isShuffling=false;
       }, REVEAL_DELAY);
@@ -522,82 +426,16 @@ try{
     modalBody.appendChild(grid);
     if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length;
     updateProgress();
-    updateSideScrollbar();
   }catch(e){ console.error('renderGrid error', e); } }
 
   // progress
-  function updateProgress(){ try{ const found = discovered.filter(Boolean).length; const pct = Math.round((found / ITEMS_COUNT) * 100); const bar = document.getElementById('progressBar'); const pctEl = document.getElementById('progressPct'); const foundEl = document.getElementById('foundCount'); if(bar) bar.style.width = pct + '%'; if(pctEl) pctEl.textContent = pct + '%'; if(foundEl) foundEl.textContent = found; if(bar) bar.setAttribute('aria-valuenow', String(pct)); }catch(e){/*silent*/} }
+  function updateProgress(){ try{ const found = discovered.filter(Boolean).length; const bar = document.getElementById('progressBar'); const pctEl = document.getElementById('progressPct'); const foundEl = document.getElementById('foundCount'); if(foundEl) foundEl.textContent = found; if(bar) bar.style.width = '0%'; if(pctEl) pctEl.textContent = ''; if(bar) bar.setAttribute('aria-valuenow', '0'); }catch(e){/*silent*/} }
 
-  // custom scrollbar + mobile indicator
-  function positionSidebar(){ try{ if(!verticalScrollbar) return; const parentModal = verticalScrollbar.parentElement; const modalRect = parentModal.getBoundingClientRect(); const bodyRect = modalBody.getBoundingClientRect(); const top = bodyRect.top - modalRect.top; const height = modalBody.clientHeight; verticalScrollbar.style.top = Math.max(8, top) + 'px'; verticalScrollbar.style.height = (height) + 'px'; }catch(e){} }
-  function updateSideScrollbar(){ try{
-    if(!modalBody || !track || !thumb || !verticalScrollbar || !modal) return;
-    positionSidebar();
-    const contentH = modalBody.scrollHeight;
-    const visibleH = modalBody.clientHeight;
-    const trackH = track.clientHeight;
-    const maxScroll = Math.max(0, contentH - visibleH);
-    if(maxScroll <= 0){
-      verticalScrollbar.setAttribute('aria-hidden','true');
-      modal.classList.remove('has-side-scrollbar');
-    } else {
-      verticalScrollbar.setAttribute('aria-hidden','false');
-      modal.classList.add('has-side-scrollbar');
-      const thumbH = Math.max(40, Math.round((visibleH / contentH) * trackH));
-      const maxThumbTop = trackH - thumbH;
-      const pct = modalBody.scrollTop / maxScroll;
-      const top = Math.round(pct * maxThumbTop);
-      thumb.style.height = thumbH + 'px';
-      thumb.style.top = top + 'px';
-    }
-    // always update mobile indicator too (it will hide itself if not mobile)
-    updateMobileScrollIndicator();
-  }catch(e){console.error(e)} }
-
-  // mobile scroll indicator: small top-right fill showing scroll position (visible only on narrow screens)
-  function updateMobileScrollIndicator(){
-    try{
-      if(!mobileIndicator || !mobileFill || !modalBody) return;
-      const isMobile = window.innerWidth <= 420;
-      if(!isMobile){ mobileIndicator.setAttribute('aria-hidden','true'); mobileIndicator.style.display = 'none'; return; }
-      const contentH = modalBody.scrollHeight;
-      const visibleH = modalBody.clientHeight;
-      const maxScroll = Math.max(0, contentH - visibleH);
-      if(maxScroll <= 0){
-        mobileIndicator.setAttribute('aria-hidden','true');
-        mobileIndicator.style.display = 'none';
-        return;
-      }
-      mobileIndicator.setAttribute('aria-hidden','false');
-      mobileIndicator.style.display = 'block';
-      const pct = Math.min(1, modalBody.scrollTop / maxScroll);
-      mobileFill.style.width = `${Math.round(pct * 100)}%`;
-    }catch(e){}
-  }
-
-  // track click (desktop)
-  if(track){ track.addEventListener('click', (e)=>{ try{ if(e.target === thumb) return; const rect = track.getBoundingClientRect(); const clickY = e.clientY - rect.top; const thumbH = thumb.clientHeight || 40; const maxTop = track.clientHeight - thumbH; const newTop = Math.min(Math.max(0, clickY - thumbH/2), maxTop); const pct = newTop / (maxTop || 1); modalBody.scrollTop = Math.round(pct * (modalBody.scrollHeight - modalBody.clientHeight)); updateSideScrollbar(); }catch(e){} }); }
-
-  // thumb drag
-  let dragging=false, dragStartY=0, startTop=0;
-  function onThumbMove(e){ if(!dragging) return; const dy = e.clientY - dragStartY; const trackH = track.clientHeight; const thumbH = thumb.clientHeight; const maxTop = Math.max(0, trackH - thumbH); const newTop = Math.min(Math.max(0, startTop + dy), maxTop); const pct = newTop / (maxTop || 1); modalBody.scrollTop = Math.round(pct * (modalBody.scrollHeight - modalBody.clientHeight)); updateSideScrollbar(); }
-  function onThumbUp(){ dragging=false; document.removeEventListener('pointermove', onThumbMove); document.removeEventListener('pointerup', onThumbUp); }
-  if(thumb){ thumb.addEventListener('pointerdown', (e)=>{ dragging=true; dragStartY=e.clientY; startTop = parseInt(thumb.style.top || '0',10) || 0; thumb.setPointerCapture && thumb.setPointerCapture(e.pointerId); document.addEventListener('pointermove', onThumbMove); document.addEventListener('pointerup', onThumbUp); e.preventDefault(); }); thumb.addEventListener('keydown', (e)=>{ if(e.key==='ArrowDown') modalBody.scrollBy({top:40,behavior:'smooth'}); if(e.key==='ArrowUp') modalBody.scrollBy({top:-40,behavior:'smooth'}); if(e.key==='PageDown') modalBody.scrollBy({top: modalBody.clientHeight, behavior:'smooth'}); if(e.key==='PageUp') modalBody.scrollBy({top:-modalBody.clientHeight,behavior:'smooth'}); }); }
-
-  if(modalBody){
-    modalBody.addEventListener('scroll', () => {
-      if (typeof window.__sideTimer !== 'undefined') clearTimeout(window.__sideTimer);
-      window.__sideTimer = setTimeout(()=>{ updateSideScrollbar(); }, 30);
-      // update mobile indicator immediately for snappiness
-      updateMobileScrollIndicator();
-    });
-  }
-
-  window.addEventListener('resize', ()=>{ positionSidebar(); updateSideScrollbar(); updateMobileScrollIndicator(); });
+  window.addEventListener('resize', ()=>{ /* no custom scrollbar to update */ });
 
   // events
   if(drawBtn){ drawBtn.addEventListener('click', ()=>{ try{ if(secondsUntilNextDraw()>0){ updateDrawCooldownUI(); return; } startShuffle(1400); }catch(e){} }); }
-  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); setTimeout(()=>{ positionSidebar(); updateSideScrollbar(); updateMobileScrollIndicator(); }, 80); } }catch(e){} }); }
+  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); } }catch(e){} }); }
   if(closeModal){ closeModal.addEventListener('click', ()=>{ if(modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); }
   if(modalBackdrop){ modalBackdrop.addEventListener('click',(e)=>{ if(e.target===modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); }
 
@@ -616,7 +454,6 @@ try{
       updateDec24(); updateDrawCooldownUI(); setInterval(updateDec24,1000); setInterval(updateDrawCooldownUI,1000);
       if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length;
       updateProgress();
-      setTimeout(()=>{ positionSidebar(); updateSideScrollbar(); updateMobileScrollIndicator(); }, 120);
     }catch(e){ console.error('init error', e); }
   })();
 
@@ -628,5 +465,6 @@ try{
 </script>
 </body>
 </html>
+
 
 
