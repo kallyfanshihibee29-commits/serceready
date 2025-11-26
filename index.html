@@ -9,13 +9,16 @@
 
 <style>
   :root{
+    /* domyślny (Niebieski) */
     --bg: #9fc6e2;
     --bg2: #cfe8f8;
     --navy: #1e3a8a;
     --quote-grad-start: #3b5998;
     --quote-grad-end: #5a8dee;
+    --accent: #2b7bd6;
     --glass-border: rgba(255,255,255,0.36);
   }
+
   html,body{height:100%;margin:0;font-family:Roboto,system-ui,-apple-system,"Segoe UI",Arial;}
   body{
     background: linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%);
@@ -23,7 +26,7 @@
     background-attachment: fixed;
     background-size: 100% 100vh;
     min-height: 100vh;
-    color:#05203f;
+    color:var(--navy);
     -webkit-font-smoothing:antialiased;
   }
   @media (max-width:420px){
@@ -32,7 +35,27 @@
 
   .container{max-width:720px;margin:18px auto;padding:18px;}
   header{text-align:center;margin-bottom:32px;}
-  .title{font-family:Pacifico,cursive;font-size:36px;color:var(--navy);margin:0;line-height:1}
+  .title{font-family:Pacifico,cursive;font-size:36px;color:var(--navy);margin:0;line-height:1;position:relative;z-index:1}
+
+  /* Glow behind title when holiday theme */
+  .title::after{
+    content:"";
+    position:absolute;
+    left:50%;
+    top:30%;
+    transform:translateX(-50%) scale(1);
+    width:420px;
+    height:140px;
+    border-radius:50%;
+    pointer-events:none;
+    opacity:0;
+    transition:opacity .32s ease, transform .32s ease, filter .32s ease;
+    background: radial-gradient(circle at 50% 30%, rgba(255,223,96,0.45) 0%, rgba(255,223,96,0.12) 30%, transparent 60%);
+    filter: blur(28px) saturate(120%);
+    z-index:0;
+  }
+  /* When holiday theme is active show stronger glow and slightly scale */
+  .theme-holiday .title::after{ opacity:1; transform:translateX(-50%) scale(1.06); }
 
   .card{background:rgba(255,255,255,0.95);border-radius:16px;padding:16px;box-shadow:0 8px 20px rgba(6,21,52,0.12);border:1px solid rgba(30,58,138,0.06)}
   .draw-area{display:flex;flex-direction:column;gap:12px;align-items:center}
@@ -100,7 +123,6 @@
     background: rgba(255,255,255,0.06); /* bardzo przezroczyste, jasne szkło */
     border: 1px solid var(--glass-border);
     border-radius:14px;
-    /* lżejszy cień, bez silnego przyciemnienia */
     box-shadow:
       0 8px 24px rgba(6,21,52,0.10),
       inset 0 1px 0 rgba(255,255,255,0.6);
@@ -113,6 +135,8 @@
     flex-direction:column;
     transition: background .22s ease, box-shadow .22s ease, border .22s ease;
   }
+  /* shorter modal variant for Księga */
+  .modal.short-modal{ max-height: 60vh; }
 
   .modal-inner{padding:14px; position: relative; z-index: 10; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius: 12px;}
   .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
@@ -127,7 +151,7 @@
 
   .close{border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--navy)}
 
-  /* modal body stays scrollable; neutral/light background so content is czytelny */
+  /* modal body stays scrollable; neutral/light background so content jest czytelny */
   .modal-body{
     width:100%;
     overflow-y:auto;
@@ -136,7 +160,7 @@
     background: rgba(255,255,255,0.01);
     box-sizing:border-box;
     scroll-behavior:smooth;
-    scrollbar-width: auto; /* allow native scrolling */
+    scrollbar-width: auto;
     -ms-overflow-style: auto;
     flex:1;
     min-height:0;
@@ -207,12 +231,186 @@
     .controls{flex-direction:column;align-items:stretch}
     .controls .btn{width:100%}
     .grid{grid-template-columns: repeat(2, 1fr); gap:12px; padding:6px;}
-    .modal{max-height: calc(100vh - 24px);}
+    .modal{max-height: calc(100vh - 24px);} /* keep reasonable on small screens */
+    .modal.short-modal{ max-height: 50vh; }
     .modal-body{padding-bottom:28px;}
   }
 
   /* small helper to avoid image overflow inside preview / items */
   img{max-width:100%;height:auto;-o-object-fit:contain}
+
+  /* -----------------------------
+     SETTINGS BUTTON & PANEL
+     ----------------------------- */
+  .settings-btn{
+    position:fixed;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    width:56px;
+    height:56px;
+    border-radius:50%;
+    background: rgba(255,255,255,0.10);
+    border:1px solid rgba(255,255,255,0.18);
+    backdrop-filter: blur(10px) saturate(120%);
+    -webkit-backdrop-filter: blur(10px) saturate(120%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    z-index:3000;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.12);
+    transition:transform .15s ease, box-shadow .15s ease;
+    color:var(--navy);
+  }
+  .settings-btn:active{ transform:translateY(-50%) scale(.98); }
+  .settings-btn:focus{ outline:3px solid rgba(0,0,0,0.06); outline-offset:2px; }
+
+  .settings-panel{
+    position:fixed;
+    right:86px;
+    top:50%;
+    transform:translateY(-50%);
+    width:320px;
+    max-width:calc(100% - 140px);
+    background: rgba(255,255,255,0.06);
+    border:1px solid var(--glass-border);
+    border-radius:12px;
+    padding:12px;
+    box-shadow: 0 12px 36px rgba(2,6,23,0.12);
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    display:none;
+    flex-direction:column;
+    gap:8px;
+    z-index:2999;
+
+    /* ograniczenie wysokości i przewijanie gdy treści za dużo */
+    max-height: 70vh;
+    overflow: hidden; /* wewnętrzne listy będą miały własne scrollowanie */
+  }
+  .settings-panel.show{ display:flex; }
+  .settings-panel .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .settings-panel h3{margin:0;font-size:14px;color:var(--navy);font-weight:900}
+
+  /* listy schematów przewijalne (jeśli potrzeba) */
+  .theme-list{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:8px;
+    margin-top:8px;
+    /* ograniczamy przestrzeń, umożliwiamy przewijanie */
+    max-height: calc( (70vh - 120px) / 2 ); /* zabezpieczenie proporcji */
+    overflow-y: auto;
+    padding-right:6px; /* zostawić miejsce na scrollbar */
+  }
+
+  .theme-option{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px;
+    border-radius:10px;
+    border:1px solid rgba(0,0,0,0.04);
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    cursor:pointer;
+    min-height:48px;
+    text-align:left;
+    box-shadow: 0 6px 12px rgba(2,6,23,0.06);
+  }
+  .theme-option:focus{ outline:2px solid rgba(0,0,0,0.06); }
+  .swatch{
+    width:44px;
+    height:40px;
+    border-radius:8px;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.06);
+    flex-shrink:0;
+    border:1px solid rgba(255,255,255,0.06);
+    overflow:hidden;
+  }
+  .theme-option .meta{font-size:13px;font-weight:700;color:var(--navy)}
+  .theme-option .sub{font-size:11px;font-weight:600;color:rgba(5,32,63,0.6)}
+
+  .settings-footer{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px}
+  .text-muted{font-size:12px;color:rgba(5,32,63,0.6)}
+  .small-btn{padding:8px 10px;border-radius:10px;border:none;background:transparent;color:var(--navy);font-weight:700;cursor:pointer}
+  .small-btn.ghost{border:1px solid rgba(255,255,255,0.06);background:transparent}
+  @media (max-width:520px){
+    .settings-panel{ right:18px; left:18px; top:auto; bottom:18px; transform:none; width:auto; max-width:calc(100% - 36px); }
+    .settings-btn{ right:18px; top:auto; bottom:18px; transform:none; }
+    .theme-list{ max-height: 34vh; }
+  }
+
+  /* ANIMATIONS for button in/out */
+  @keyframes spinOut {
+    0% { transform: translateY(-50%) rotate(0deg) scale(1); opacity:1; }
+    70% { transform: translateY(-50%) rotate(300deg) scale(0.6); opacity:0.8; }
+    100% { transform: translateY(-50%) rotate(540deg) scale(0.2); opacity:0; }
+  }
+  .spin-out{
+    animation: spinOut 420ms cubic-bezier(.2,.9,.3,1) forwards;
+  }
+
+  @keyframes spinIn {
+    0% { transform: translateY(-50%) rotate(-360deg) scale(0.25); opacity:0; }
+    70% { transform: translateY(-50%) rotate(20deg) scale(1.12); opacity:1; }
+    100% { transform: translateY(-50%) rotate(0deg) scale(1); opacity:1; }
+  }
+  .spin-in{
+    display:flex !important;
+    animation: spinIn 560ms cubic-bezier(.2,.9,.3,1) forwards;
+  }
+
+  .settings-panel.show { transform: translateY(-50%) translateX(-6px); transition: transform .18s ease; }
+
+  .seasonal-title { font-size:12px; font-weight:900; color:var(--navy); margin-top:6px }
+
+  /* ===========================
+     ONBOARDING: GLASS / NARROWER
+     =========================== */
+  .sg-onboard-overlay{
+    position:fixed;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:4000;
+    padding:20px;
+    background: transparent; /* nie przyciemniać całego tła, glass box ma wystarczający kontrast */
+  }
+  .sg-onboard-box{
+    width:100%;
+    max-width:460px;      /* węższe niż wcześniej (było 680px) */
+    min-width:300px;
+    max-height:72vh;      /* dłuższe / pozwala na przewijanie */
+    overflow:auto;
+    border-radius:14px;
+    padding:18px;
+    box-sizing:border-box;
+    background: rgba(255,255,255,0.06); /* szkło jak modal */
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 20px 40px rgba(2,6,23,0.28);
+    backdrop-filter: blur(30px) saturate(120%);
+    -webkit-backdrop-filter: blur(30px) saturate(120%);
+  }
+  .sg-onboard-inner{
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius:10px;
+    padding:14px;
+    color:var(--navy);
+  }
+  .sg-onboard-p{
+    font-size:16px;
+    line-height:1.5;
+    margin:0 0 12px 0;
+    color:var(--navy);
+  }
+  .sg-onboard-actions{ display:flex; gap:10px; justify-content:flex-end; margin-top:10px; }
+  .sg-onboard-ok{ padding:10px 12px; border-radius:10px; font-weight:700; cursor:pointer; border:1px solid rgba(255,255,255,0.06); background:transparent; color:var(--navy); }
+  @media (max-width:520px){
+    .sg-onboard-box{ max-width:calc(100% - 40px); min-width:unset; padding:14px; }
+    .sg-onboard-p{ font-size:15px }
+  }
 </style>
 </head>
 <body>
@@ -259,7 +457,6 @@
     <div class="modal" role="document">
       <div class="modal-inner">
         <div class="modal-header">
-          <!-- removed title/hint per request -->
           <div style="display:flex;gap:10px;align-items:center;">
             <div class="mission" style="min-width:150px;">
               <div class="mission-title">Zdobądź wszystkie</div>
@@ -281,11 +478,370 @@
     </div>
   </div>
 
+  <!-- SETTINGS BUTTON & PANEL -->
+  <button id="settingsBtn" class="settings-btn" title="Ustawienia kolorów" aria-haspopup="true" aria-expanded="false">
+    <!-- gear icon (inline SVG) -->
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M19.4 15a7.6 7.6 0 0 0 .1-1 7.6 7.6 0 0 0-.1-1l2.1-1.6a.6.6 0 0 0 .14-.77l-2-3.46a.6.6 0 0 0-.73-.26l-2.5 1a7.2 7.2 0 0 0-1.73-.99l-.38-2.65A.6.6 0 0 0 12.7 2h-4a.6.6 0 0 0-.6.52l-.38 2.65a7.2 7.2 0 0 0-1.73.99l-2.5-1a.6.6 0 0 0-.73.26L2.1 8.6a.6.6 0 0 0 .14.77L4.4 11a7.6 7.6 0 0 0-.1 1c0 .33.03.66.1 1L2.1 14.6a.6.6 0 0 0-.14.77l2 3.46c.16.28.49.4.77.26l2.5-1c.53.4 1.1.73 1.73.99l.38 2.65c.06.3.33.52.63.52h4c.3 0 .57-.22.63-.52l.38-2.65c.63-.26 1.2-.59 1.73-.99l2.5 1c.28.14.61.02.77-.26l2-3.46a.6.6 0 0 0-.14-.77L19.4 15z" stroke="currentColor" stroke-width="1.0" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+  </button>
+
+  <div id="settingsPanel" class="settings-panel" role="dialog" aria-hidden="true" aria-label="Wybór schematu kolorów">
+    <div class="row">
+      <h3>Dostosuj wygląd aplikacji</h3>
+      <button id="closeSettings" class="small-btn" aria-label="Zamknij panel">✕</button>
+    </div>
+
+    <div class="seasonal-title">Sezonowe Kolory</div>
+    <div class="theme-list" id="seasonalList" style="margin-bottom:6px;">
+      <!-- sezonalne opcje - wypełni JS -->
+    </div>
+
+    <div class="seasonal-title">Standardowe Kolory</div>
+    <div class="theme-list" id="themeList">
+      <!-- wypełniane JS -->
+    </div>
+
+    <div class="settings-footer">
+      <div></div>
+      <div style="display:flex;gap:8px;">
+        <button id="resetTheme" class="small-btn ghost">Reset</button>
+      </div>
+    </div>
+  </div>
+
 <script>
-// ZMIANY: usuń checkbox powtórek, zawsze dozwolone powtórki; usuń niestandardowy pasek przewijania —
-// obsługa przewijania odbywa się teraz natywnie (mysz/palec). Zmniejszono i uproszczono kod.
 (function(){
 try{
+  /* --------------------------
+     THEME DEFINITIONS
+     -------------------------- */
+  const THEMES = {
+    "holiday": {
+      name: "Świąteczna Harmonia",
+      /* zmienione: jaśniejsze ciemne tła niż wcześniej */
+      bg: "#114d38",
+      bg2: "#165e41",
+      navy: "#6b0f1a",
+      start: "#6b0f1a",
+      end: "#059669",
+      accent: "#8b1530"
+    },
+    "blue": {
+      name: "Niebieski (domyślny)",
+      bg: "#9fc6e2",
+      bg2: "#cfe8f8",
+      navy: "#1e3a8a",
+      start: "#3b5998",
+      end: "#5a8dee",
+      accent: "#2b7bd6"
+    },
+    "light-blue": {
+      name: "Jasny błękit",
+      bg: "#bfdbfe",
+      bg2: "#dbeafe",
+      navy: "#1e40af",
+      start: "#60a5fa",
+      end: "#3b82f6",
+      accent: "#2563eb"
+    },
+    "green": {
+      name: "Zielony",
+      bg: "#a7f3d0",
+      bg2: "#d1fae5",
+      navy: "#064e3b",
+      start: "#059669",
+      end: "#10b981",
+      accent: "#047857"
+    },
+    "moldy-green": {
+      name: "Spleśniała zieleń",
+      bg: "#8b9467",
+      bg2: "#a8b584",
+      navy: "#3d4a2b",
+      start: "#6b7c4f",
+      end: "#5a6b42",
+      accent: "#4a5635"
+    },
+    "gray": {
+      name: "Szary",
+      bg: "#e5e7eb",
+      bg2: "#f3f4f6",
+      navy: "#111827",
+      start: "#4b5563",
+      end: "#6b7280",
+      accent: "#374151"
+    },
+    "bw": {
+      name: "Czarno-biały",
+      bg: "#ffffff",
+      bg2: "#f8f9fa",
+      navy: "#000000",
+      start: "#000000",
+      end: "#333333",
+      accent: "#666666"
+    },
+    "pink": {
+      name: "Różowy",
+      bg: "#fce7f3",
+      bg2: "#fdf2f8",
+      navy: "#831843",
+      start: "#db2777",
+      end: "#ec4899",
+      accent: "#be185d"
+    },
+    "light-rose": {
+      name: "Jasny różany",
+      bg: "#ffe4e6",
+      bg2: "#fef2f2",
+      navy: "#881337",
+      start: "#f43f5e",
+      end: "#e11d48",
+      accent: "#dc2626"
+    },
+    "orange": {
+      name: "Pomarańczowy",
+      bg: "#fed7aa",
+      bg2: "#fef3c7",
+      navy: "#92400e",
+      start: "#f59e0b",
+      end: "#f97316",
+      accent: "#d97706"
+    },
+    "pumpkin": {
+      name: "Dojrzała dynia",
+      bg: "#ff6b35",
+      bg2: "#ffedd5",
+      navy: "#7c2d12",
+      start: "#ea580c",
+      end: "#dc2626",
+      accent: "#C2410c"
+    },
+    "purple": {
+      name: "Fioletowy",
+      bg: "#e9d5ff",
+      bg2: "#f3e8ff",
+      navy: "#581c87",
+      start: "#8b5cf6",
+      end: "#a855f7",
+      accent: "#7c3aed"
+    },
+    "plum": {
+      name: "Śliwkowy",
+      bg: "#c8b5d1",
+      bg2: "#ebd9ea",
+      navy: "#4a2c5a",
+      start: "#8e4a9c",
+      end: "#6b3775",
+      accent: "#7a4285"
+    },
+    "beige": {
+      name: "Beżowy",
+      bg: "#f7f3e9",
+      bg2: "#fdf9f1",
+      navy: "#8b4513",
+      start: "#e6d7c3",
+      end: "#d4b896",
+      accent: "#c19a6b"
+    },
+    "latte": {
+      name: "Spienione latte",
+      bg: "#d4b896",
+      bg2: "#e8d5b7",
+      navy: "#5d4037",
+      start: "#8d6e63",
+      end: "#6d4c41",
+      accent: "#795548"
+    }
+  };
+
+  const STANDARD_ORDER = ["blue","light-blue","green","moldy-green","gray","bw","pink","light-rose","orange","pumpkin","purple","plum","beige","latte"];
+  const SEASONAL_ORDER = ["holiday"];
+
+  const THEME_KEY = 'sg_theme_v1';
+
+  /* --------------------------
+     UI: build options list
+     -------------------------- */
+  const themeListEl = document.getElementById('themeList');
+  const seasonalListEl = document.getElementById('seasonalList');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const settingsPanel = document.getElementById('settingsPanel');
+
+  function createOptionElement(key){
+    const t = THEMES[key];
+    const btn = document.createElement('button');
+    btn.className = 'theme-option';
+    btn.type = 'button';
+    btn.setAttribute('data-theme', key);
+    btn.setAttribute('title', t.name);
+    btn.innerHTML = `
+      <div class="swatch" aria-hidden="true"></div>
+      <div style="flex:1;">
+        <div class="meta">${t.name}</div>
+        <div class="sub">${t.bg} · ${t.navy}</div>
+      </div>
+    `;
+    // style swatch
+    const sw = btn.querySelector('.swatch');
+    sw.style.background = `linear-gradient(180deg, ${t.start}, ${t.end})`;
+    sw.style.position = 'relative';
+    const bgPatch = document.createElement('div');
+    bgPatch.style.position='absolute';
+    bgPatch.style.bottom='0';
+    bgPatch.style.left='0';
+    bgPatch.style.right='0';
+    bgPatch.style.height='36%';
+    bgPatch.style.background = `linear-gradient(90deg, ${t.bg}, ${t.bg2})`;
+    bgPatch.style.borderTop = '1px solid rgba(255,255,255,0.02)';
+    sw.appendChild(bgPatch);
+
+    // click behavior: hide panel, apply theme, animate button back
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      hideSettings();
+      // slight delay so hide feels natural, then apply + animate in
+      setTimeout(()=>{
+        applyTheme(key);
+        animateButtonIn();
+      }, 180);
+    });
+
+    // keyboard: Enter / Space
+    btn.addEventListener('keydown', (e)=>{
+      if(e.key === 'Enter' || e.key === ' '){
+        e.preventDefault();
+        btn.click();
+      }
+    });
+
+    return btn;
+  }
+
+  // populate seasonal first
+  SEASONAL_ORDER.forEach(k=>{
+    if(!THEMES[k]) return;
+    seasonalListEl.appendChild(createOptionElement(k));
+  });
+  // populate standard
+  STANDARD_ORDER.forEach(k=>{
+    if(!THEMES[k]) return;
+    themeListEl.appendChild(createOptionElement(k));
+  });
+
+  /* --------------------------
+     THEME APPLY / PERSIST + button animation helpers
+     -------------------------- */
+  function applyTheme(key){
+    const t = THEMES[key];
+    if(!t) return;
+    const root = document.documentElement.style;
+    root.setProperty('--bg', t.bg);
+    root.setProperty('--bg2', t.bg2);
+    root.setProperty('--navy', t.navy);
+    root.setProperty('--quote-grad-start', t.start);
+    root.setProperty('--quote-grad-end', t.end);
+    root.setProperty('--accent', t.accent || t.start);
+    // toggle holiday class to enable title glow
+    document.documentElement.classList.toggle('theme-holiday', key === 'holiday');
+    if (isDarkColor(t.bg)) {
+      root.setProperty('--glass-border', 'rgba(255,255,255,0.08)');
+    } else {
+      root.setProperty('--glass-border', 'rgba(255,255,255,0.36)');
+    }
+    try{ localStorage.setItem(THEME_KEY, key); }catch(e){}
+    updateSettingsBtnColor();
+  }
+
+  function resetTheme(){
+    try{ localStorage.removeItem(THEME_KEY); }catch(e){}
+    applyTheme('blue');
+    animateButtonIn();
+  }
+
+  function loadSavedTheme(){
+    try{
+      const saved = localStorage.getItem(THEME_KEY);
+      if(saved && THEMES[saved]) { applyTheme(saved); return; }
+    }catch(e){}
+    applyTheme('blue');
+  }
+
+  function isDarkColor(hex){
+    try{
+      const c = hex.replace('#','');
+      const r = parseInt(c.substring(0,2),16);
+      const g = parseInt(c.substring(2,4),16);
+      const b = parseInt(c.substring(4,6),16);
+      const lum = 0.2126*r + 0.7152*g + 0.0722*b;
+      return lum < 160;
+    }catch(e){ return false; }
+  }
+
+  function updateSettingsBtnColor(){
+    const nav = getComputedStyle(document.documentElement).getPropertyValue('--navy').trim();
+    settingsBtn.style.color = nav || 'var(--navy)';
+  }
+
+  /* --------------------------
+     SETTINGS PANEL SHOW / HIDE + animations
+     -------------------------- */
+  const closeSettings = document.getElementById('closeSettings');
+  const resetBtn = document.getElementById('resetTheme');
+
+  function showSettings(){
+    settingsPanel.classList.add('show');
+    settingsPanel.setAttribute('aria-hidden','false');
+    settingsBtn.setAttribute('aria-expanded','true');
+    const first = settingsPanel.querySelector('.theme-option');
+    if(first) first.focus();
+    setTimeout(()=>{ document.addEventListener('click', outsideClick); }, 50);
+  }
+  function hideSettings(){
+    settingsPanel.classList.remove('show');
+    settingsPanel.setAttribute('aria-hidden','true');
+    settingsBtn.setAttribute('aria-expanded','false');
+    document.removeEventListener('click', outsideClick);
+    if(settingsBtn.style.display !== 'none') settingsBtn.focus();
+  }
+  function outsideClick(e){
+    if(!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) hideSettings();
+  }
+
+  function animateButtonOutAndShowPanel(){
+    settingsBtn.classList.remove('spin-in');
+    settingsBtn.classList.add('spin-out');
+    settingsBtn.style.pointerEvents = 'none';
+    setTimeout(()=>{ settingsBtn.style.display = 'none'; settingsBtn.classList.remove('spin-out'); settingsBtn.style.pointerEvents = ''; showSettings(); }, 420);
+  }
+
+  function animateButtonIn(){
+    settingsBtn.style.display = 'flex';
+    settingsBtn.classList.remove('spin-out');
+    setTimeout(()=>{
+      settingsBtn.classList.add('spin-in');
+      setTimeout(()=>{ settingsBtn.classList.remove('spin-in'); }, 700);
+    }, 40);
+  }
+
+  settingsBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    if(settingsPanel.classList.contains('show')){ hideSettings(); return; }
+    animateButtonOutAndShowPanel();
+  });
+  closeSettings.addEventListener('click', hideSettings);
+  resetBtn.addEventListener('click', resetTheme);
+
+  // keyboard accessibility for settings button
+  settingsBtn.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if(settingsPanel.classList.contains('show')) hideSettings(); else animateButtonOutAndShowPanel(); }
+  });
+
+  /* --------------------------
+     existing app JS (unchanged) with theme loading
+     -------------------------- */
+
   const ITEMS_COUNT = 17;
   const DISC_KEY = 'sg_discovered_v1';
   const LAST_KEY = 'sg_lastDraw_v1';
@@ -305,7 +861,6 @@ try{
   const foundCountEl = document.getElementById('foundCount');
   const previewEl = document.getElementById('preview');
 
-  // safe localStorage helpers
   function safeGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
   function safeSet(key,val){ try{ localStorage.setItem(key,val); }catch(e){ console.warn('localStorage set failed',e); } }
 
@@ -328,10 +883,8 @@ try{
   let lastDraw = loadLastDraw();
   let lastIndex = loadLastIndex();
 
-  // small helpers
   function randomInt(max){ return Math.floor(Math.random()*max); }
 
-  // image fallback
   function tryImageSources(imgEl, index){
     if(!imgEl) return;
     const candidates = [
@@ -373,7 +926,7 @@ try{
       showImage(final); if(centralImg) centralImg.style.transform='scale(1) rotate(0deg)'; if(centralImg) centralImg.classList.add('dimmed'); if(previewEl) previewEl.classList.add('show-overlay'); if(captionEl) captionEl.textContent='...';
 
       const REVEAL_DELAY=700;
-      setTimeout(()=>{ 
+      setTimeout(()=>{
         if(previewEl) previewEl.classList.remove('show-overlay'); if(centralImg) centralImg.classList.remove('dimmed');
         if(captionEl) captionEl.textContent = captions[final] || '';
         // jeżeli już odkryte — zostanie normalnie pokazane (powtórki są dozwolone)
@@ -401,7 +954,7 @@ try{
     "Czekoladowy płatek śniegu – postaraj się dziś być spokojny i miły.",
     "Czekoladowy pastuszek – odmów „Chwała Ojcu”.",
     "Czekoladowa świeca – pomódl się za zmarłych.",
-    "Czekoladowe serce z napisem „Miłość” – powiedz komuś „chocham cię”."
+    "Czekoladowe serce z napisem „Miłość” – powiedz komuś „kocham cię”."
   ];
   const names = captions.map(c=>c.split('–')[0].trim());
 
@@ -420,7 +973,7 @@ try{
       const desc = document.createElement('div'); desc.className='desc'; desc.textContent = discovered[idx] ? captions[idx] : 'Odkryj tę czekoladkę, aby poznać misję.';
       if(!discovered[idx]) item.classList.add('dimmed');
       item.appendChild(imgWrap); item.appendChild(name); item.appendChild(desc);
-      item.addEventListener('click', ()=>{ showImage(idx); captionEl.textContent = discovered[idx] ? captions[idx] : 'Wciąż możesz odkryć tę czekoladkę ponownie.'; lastIndex=idx; saveLastIndex(idx); if(modalBackdrop) { modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } });
+      item.addEventListener('click', ()=>{ showImage(idx); captionEl.textContent = discovered[idx] ? captions[idx] : 'Wciąż możesz odkryć tę czekoladkę ponownie.'; lastIndex=idx; saveLastIndex(idx); if(modalBackdrop) { modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } });
       grid.appendChild(item);
     }
     modalBody.appendChild(grid);
@@ -435,11 +988,11 @@ try{
 
   // events
   if(drawBtn){ drawBtn.addEventListener('click', ()=>{ try{ if(secondsUntilNextDraw()>0){ updateDrawCooldownUI(); return; } startShuffle(1400); }catch(e){} }); }
-  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); } }catch(e){} }); }
-  if(closeModal){ closeModal.addEventListener('click', ()=>{ if(modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); }
-  if(modalBackdrop){ modalBackdrop.addEventListener('click',(e)=>{ if(e.target===modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); }
+  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modal.classList.add('short-modal'); modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); } }catch(e){} }); }
+  if(closeModal){ closeModal.addEventListener('click', ()=>{ if(modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } }); }
+  if(modalBackdrop){ modalBackdrop.addEventListener('click',(e)=>{ if(e.target===modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } }); }
 
-  document.addEventListener('keydown', (e)=>{ if(modalBackdrop && modalBackdrop.classList.contains('show')){ if(e.key==='ArrowDown') modalBody.scrollBy({top:120,behavior:'smooth'}); if(e.key==='ArrowUp') modalBody.scrollBy({top:-120,behavior:'smooth'}); if(e.key==='PageDown') modalBody.scrollBy({top: modalBody.clientHeight, behavior:'smooth'}); if(e.key==='PageUp') modalBody.scrollBy({top:-modalBody.clientHeight,behavior:'smooth'}); if(e.key==='Escape'){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } } });
+  document.addEventListener('keydown', (e)=>{ if(modalBackdrop && modalBackdrop.classList.contains('show')){ if(e.key==='ArrowDown') modalBody.scrollBy({top:120,behavior:'smooth'}); if(e.key==='ArrowUp') modalBody.scrollBy({top:-120,behavior:'smooth'}); if(e.key==='PageDown') modalBody.scrollBy({top: modalBody.clientHeight, behavior:'smooth'}); if(e.key==='PageUp') modalBody.scrollBy({top:-modalBody.clientHeight,behavior:'smooth'}); if(e.key==='Escape'){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } } });
 
   // init
   (function init(){
@@ -454,10 +1007,128 @@ try{
       updateDec24(); updateDrawCooldownUI(); setInterval(updateDec24,1000); setInterval(updateDrawCooldownUI,1000);
       if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length;
       updateProgress();
+
+      // load theme and set button color
+      loadSavedTheme();
+      updateSettingsBtnColor();
     }catch(e){ console.error('init error', e); }
   })();
 
   // expose small debug helpers
+  /* ONBOARDING: multi-step welcome shown once after update */
+  (function(){
+    const ONBOARD_KEY = 'sg_onboard_v1';
+    const FIRST_DRAW_SHOWN_KEY = 'sg_first_draw_shown_v1';
+
+    /* now use the glass / narrow box styles defined in CSS */
+    function createOverlay(msg){
+      const wrap = document.createElement('div');
+      wrap.setAttribute('role','dialog');
+      wrap.setAttribute('aria-modal','true');
+      wrap.className = 'sg-onboard-overlay';
+      wrap.style.zIndex = 4000;
+
+      const box = document.createElement('div');
+      box.className = 'sg-onboard-box';
+
+      const inner = document.createElement('div');
+      inner.className = 'sg-onboard-inner';
+
+      const p = document.createElement('div');
+      p.className = 'sg-onboard-p';
+      p.innerHTML = msg;
+
+      const actions = document.createElement('div');
+      actions.className = 'sg-onboard-actions';
+
+      const btn = document.createElement('button');
+      btn.textContent = 'OK';
+      btn.className = 'sg-onboard-ok';
+      btn.type = 'button';
+      btn.setAttribute('aria-label','Zamknij powiadomienie');
+
+      actions.appendChild(btn);
+      inner.appendChild(p);
+      inner.appendChild(actions);
+      box.appendChild(inner);
+      wrap.appendChild(box);
+
+      // keyboard: enter/space to dismiss quickly
+      btn.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); btn.click(); }
+      });
+
+      return {wrap, btn, box, p};
+    }
+
+    function runOnboardingSequence(){
+      try{
+        if(safeGet(ONBOARD_KEY)) return; // already done
+
+        /* dodałem zimowe emoji (🎄❄️) w pierwszym kroku i doprecyzowałem treść */
+        const steps = [
+          'Witaj w "Serce Gotowe" — przygotuj swoje serce na przyjście Pana Jezusa! 🎄❄️',
+          'Serce Gotowe to twój wirtualny kalendarz adwentowy — masz do zdobycia 17 unikatowych czekoladek z misjami.',
+          'Odkryj 17 misji i postaraj się zdobyć je przed 24 grudnia. Możesz losować co 24 godziny — zacznij od naciśnięcia „Wylosuj!”'
+        ];
+
+        let idx = 0;
+        const {wrap, btn, p} = createOverlay(steps[idx]);
+        document.body.appendChild(wrap);
+        // focus OK button for accessibility
+        btn.focus();
+
+        btn.addEventListener('click', function handler(){
+          idx++;
+          if(idx < steps.length){
+            p.innerHTML = steps[idx];
+            // keep the overlay, daj użytkownikowi czas na przeczytanie
+            return;
+          }
+          // final OK: remove overlay and mark onboarding started/completed
+          document.body.removeChild(wrap);
+          try{ safeSet(ONBOARD_KEY, '1'); }catch(e){}
+        });
+
+      }catch(e){ console.error('onboarding error', e); }
+    }
+
+    // show onboarding once if not already shown
+    try{ runOnboardingSequence(); }catch(e){/*silent*/}
+
+    // watch for first draw after onboarding completion
+    (function watchFirstDraw(){
+      try{
+        let prev = safeGet(LAST_KEY);
+        const check = function(){
+          const now = safeGet(LAST_KEY);
+          const onboardDone = !!safeGet(ONBOARD_KEY);
+          const firstShown = !!safeGet(FIRST_DRAW_SHOWN_KEY);
+          if(onboardDone && !firstShown && now && now !== prev){
+            // user made a draw; show the congratulatory message 1.5s after the czekoladka reveal
+            prev = now;
+            setTimeout(()=>{
+              try{
+                const msg = 'To twoja pierwsza czekoladka! Możesz je przeglądać w Księdze Czekoladek. Dostosuj aplikację w ustawieniach, jeśli chcesz. Powodzenia! 🎄';
+                const {wrap, btn} = createOverlay(msg);
+                document.body.appendChild(wrap);
+                btn.focus();
+                btn.addEventListener('click', ()=>{ try{ document.body.removeChild(wrap); safeSet(FIRST_DRAW_SHOWN_KEY,'1'); }catch(e){} });
+              }catch(e){ console.error('first-draw message error', e); }
+            }, 1500);
+          } else {
+            prev = now;
+          }
+        };
+        // poll every 700ms — lightweight and reliable inside same tab
+        const poll = setInterval(check, 700);
+        // stop polling after first shown
+        window.addEventListener('beforeunload', ()=>{ clearInterval(poll); });
+      }catch(e){ console.error('watchFirstDraw error', e); }
+    })();
+
+  })();
+
   window.sg_debug = { discovered, resetProgress: ()=>{ discovered = Array(ITEMS_COUNT).fill(false); saveDiscovered(); updateProgress(); renderGrid(); }, refreshUI: ()=>{ discovered = loadDiscovered(); updateProgress(); renderGrid(); } };
 
 }catch(err){ console.error('fatal app error', err); }
@@ -465,6 +1136,7 @@ try{
 </script>
 </body>
 </html>
+
 
 
 
