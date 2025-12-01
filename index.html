@@ -1,4 +1,4 @@
-<!doctype html> 
+<!doctype html>
 <html lang="pl">
 <head>
 <meta charset="utf-8" />
@@ -202,7 +202,7 @@
     .controls{flex-direction:column;align-items:stretch}
     .controls .btn{width:100%}
     .grid{grid-template-columns: repeat(2, 1fr); gap:12px; padding:6px;}
-    .modal{max-height: calc(100vh - 24px);}
+    .modal{max-height: calc(100vh - 24px);}    
     .modal.short-modal{ max-height: 50vh; }
     .modal-body{padding-bottom:28px;}
   }
@@ -488,10 +488,27 @@ try{
     "purple": { name: "Fioletowy", bg: "#e9d5ff", bg2: "#f3e8ff", navy: "#581c87", start: "#8b5cf6", end: "#a855f7", accent: "#7c3aed" },
     "plum": { name: "Śliwkowy", bg: "#c8b5d1", bg2: "#ebd9ea", navy: "#4a2c5a", start: "#8e4a9c", end: "#6b3775", accent: "#7a4285" },
     "beige": { name: "Beżowy", bg: "#f7f3e9", bg2: "#fdf9f1", navy: "#8b4513", start: "#e6d7c3", end: "#d4b896", accent: "#c19a6b" },
-    "latte": { name: "Spienione latte", bg: "#d4b896", bg2: "#e8d5b7", navy: "#5d4037", start: "#8d6e63", end: "#6d4c41", accent: "#795548" }
+    "latte": { name: "Spienione latte", bg: "#d4b896", bg2: "#e8d5b7", navy: "#5d4037", start: "#8d6e63", end: "#6d4c41", accent: "#795548" },
+
+    /* --- nowe motywy dostarczone przez użytkownika --- */
+    "mustard": { name: "Musztardowy", bg: "#d4a574", bg2: "#e8c9a1", navy: "#5a3e1b", start: "#b8860b", end: "#daa520", accent: "#996515" },
+    "yellow": { name: "Żółty", bg: "#fef08a", bg2: "#fef9c3", navy: "#713f12", start: "#eab308", end: "#facc15", accent: "#ca8a04" },
+    "granatowy": { name: "Granatowy", bg: "#93c5fd", bg2: "#bfdbfe", navy: "#1e3a8a", start: "#1e40af", end: "#1e3a8a", accent: "#1d4ed8" },
+    "turquoise": { name: "Jasny turkus", bg: "#a5f3fc", bg2: "#cffafe", navy: "#164e63", start: "#06b6d4", end: "#0891b2", accent: "#0e7490" }
   };
 
-  const STANDARD_ORDER = ["blue","light-blue","green","moldy-green","gray","bw","pink","light-rose","orange","pumpkin","purple","plum","beige","latte"];
+  // Kolejność tęczowa — od czerwieni/pink przez pomarańcz/żółć, zielenie, turkusy, niebieskie do fioleów i neutralnych
+  const STANDARD_ORDER = [
+    "pink","light-rose",           // róż / czerwień
+    "pumpkin","orange",            // pomarańcz
+    "mustard","yellow",            // musztarda / żółty
+    "beige","latte",               // ciepłe neutralne
+    "green","moldy-green",         // zielenie
+    "turquoise","light-blue",      // turkus / jasny błękit
+    "blue","granatowy",            // niebieskie
+    "plum","purple",               // fioletowe
+    "gray","bw"                    // szarości / czarno-białe
+  ];
   const THEME_KEY = 'sg_theme_v1';
 
   const themeListEl = document.getElementById('themeList');
@@ -855,7 +872,7 @@ try{
     "Maryja – odmów 10 różańca i ofiaruj ją w dowolnej intencji."
   ];
   const names = captions.map(c=>{
-    // rozbijamy po dłuższym myślniku (–) lub krótszym (-) na wszelki wypadek
+    // rozbijamy po dłuższym myślniku (–) lub krótszym (-) na wszelki wypadku
     if(c.indexOf('–') !== -1) return c.split('–')[0].trim();
     if(c.indexOf('-') !== -1) return c.split('-')[0].trim();
     return c;
