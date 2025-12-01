@@ -16,6 +16,7 @@
     --quote-grad-end: #5a8dee;
     --accent: #2b7bd6;
     --glass-border: rgba(255,255,255,0.36);
+    --text-shadow: none; 
   }
 
   html,body{height:100%;margin:0;font-family:Roboto,system-ui,-apple-system,"Segoe UI",Arial;}
@@ -263,26 +264,28 @@
   .settings-backdrop.show{ display:flex; }
 
   .settings-panel{
-    width:320px;
-    max-width:calc(100% - 40px);
+    width: min(520px,86vw);
+    max-width: calc(100% - 32px);
     background: rgba(255,255,255,0.06);
     border:1px solid var(--glass-border);
     border-radius:12px;
-    padding:12px;
+    padding:16px;
     box-shadow: 0 12px 36px rgba(2,6,23,0.12);
     backdrop-filter: blur(18px) saturate(120%);
     -webkit-backdrop-filter: blur(18px) saturate(120%);
     display:flex;
     flex-direction:column;
-    gap:8px;
+    gap:10px;
     z-index:3000;
-    max-height: 44vh;
-    overflow: hidden;
+    max-height: 82vh;
+    overflow: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
     transition: max-height .36s cubic-bezier(.2,.9,.3,1), transform .18s ease;
     transform: none;
   }
   .settings-panel.show {
-    max-height: 72vh;
+    max-height: 88vh;
   }
 
   .settings-panel .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
@@ -290,12 +293,13 @@
 
   .theme-list{
     display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:8px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap:10px;
     margin-top:8px;
-    max-height: calc( (44vh - 120px) / 2 );
+    max-height: calc( (82vh - 160px) );
     overflow-y: auto;
-    padding-right:6px;
+    padding-right:8px;
+    box-sizing: border-box;
   }
 
   .theme-option{
@@ -357,8 +361,14 @@
   .text-muted{font-size:12px;color:rgba(5,32,63,0.6)}
   .small-btn{padding:8px 10px;border-radius:10px;border:none;background:transparent;color:var(--navy);font-weight:700;cursor:pointer}
   .small-btn.ghost{border:1px solid rgba(255,255,255,0.06);background:transparent}
+  .tab-btn{ padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--navy); font-weight:700; cursor:pointer; }
+  .tab-btn.active{ background: linear-gradient(90deg, var(--quote-grad-start), var(--quote-grad-end)); color:#fff; border:none; box-shadow:0 8px 18px rgba(0,0,0,0.12); }
+  .small-btn.ghost{border:1px solid rgba(255,255,255,0.06);background:transparent}
   @media (max-width:520px){
-    .settings-panel{ width:320px; max-width:calc(100% - 40px); max-height: 40vh; }
+    .settings-panel{ width: min(92vw,420px); max-width:calc(100% - 24px); max-height: 82vh; padding:12px; }
+    .settings-panel.show { max-height: 88vh; }
+    .theme-list{ grid-template-columns: repeat(1, 1fr); max-height: 60vh; padding-right:6px; }
+  }
     .settings-panel.show { max-height: 58vh; }
     .theme-list{ max-height: 34vh; }
   }
@@ -451,8 +461,14 @@
 
   <div id="settingsBackdrop" class="settings-backdrop" role="dialog" aria-label="Wybór schematu kolorów" aria-hidden="true">
     <div id="settingsPanel" class="settings-panel" role="document" aria-hidden="true">
-      <div class="row">
-        <h3>Dostosuj wygląd aplikacji</h3>
+      <div class="row" style="align-items:center;">
+        <div style="display:flex;gap:8px;align-items:center;">
+          <h3 style="margin:0;">Dostosuj wygląd aplikacji</h3>
+          <div class="tabs" style="margin-left:8px;">
+            <button id="tabStandard" class="small-btn tab-btn active" type="button">Standardowe</button>
+            <button id="tabSeasonal" class="small-btn tab-btn" type="button">Kolory Sezonowe</button>
+          </div>
+        </div>
         <button id="closeSettings" class="small-btn" aria-label="Zamknij panel">✕</button>
       </div>
 
@@ -494,7 +510,9 @@ try{
     "mustard": { name: "Musztardowy", bg: "#d4a574", bg2: "#e8c9a1", navy: "#5a3e1b", start: "#b8860b", end: "#daa520", accent: "#996515" },
     "yellow": { name: "Żółty", bg: "#fef08a", bg2: "#fef9c3", navy: "#713f12", start: "#eab308", end: "#facc15", accent: "#ca8a04" },
     "granatowy": { name: "Granatowy", bg: "#93c5fd", bg2: "#bfdbfe", navy: "#1e3a8a", start: "#1e40af", end: "#1e3a8a", accent: "#1d4ed8" },
-    "turquoise": { name: "Jasny turkus", bg: "#a5f3fc", bg2: "#cffafe", navy: "#164e63", start: "#06b6d4", end: "#0891b2", accent: "#0e7490" }
+    "turquoise": { name: "Jasny turkus", bg: "#a5f3fc", bg2: "#cffafe", navy: "#164e63", start: "#06b6d4", end: "#0891b2", accent: "#0e7490" },
+    "holiday_harmony": { name: "Świąteczna Harmonia", bg: "#1a472a", bg2: "#2d5a3d", navy: "#ffffff", start: "#c41e3a", end: "#8b0000", accent: "#ffffff", textShadow: "0 1px 0 rgba(0,0,0,0.6), 0 0 8px rgba(255,255,255,0.12)" },
+    "snow_storm": { name: "Śnieżna Zadyma", bg: "#e0f2fe", bg2: "#f0f9ff", navy: "#0c4a6e", start: "#0ea5e9", end: "#38bdf8", accent: "#0284c7", textShadow: "none" }
   };
 
   // Kolejność tęczowa — od czerwieni/pink przez pomarańcz/żółć, zielenie, turkusy, niebieskie do fioleów i neutralnych
@@ -574,6 +592,39 @@ try{
     themeListEl.appendChild(createOptionElement(k));
   });
 
+  // --- zakładka "Kolory Sezonowe" ---
+  const seasonalKeys = ['holiday_harmony','snow_storm'];
+  const seasonalListEl = document.getElementById('seasonalList');
+  seasonalKeys.forEach(k=>{
+    if(!THEMES[k]) return;
+    seasonalListEl.appendChild(createOptionElement(k));
+  });
+
+  // ustawienia przełącznika zakładek
+  const tabStandard = document.getElementById('tabStandard');
+  const tabSeasonal = document.getElementById('tabSeasonal');
+  const seasonalTitleEl = document.querySelector('.seasonal-title');
+  // ukryj sezonowe domyślnie
+  seasonalListEl.style.display = 'none';
+  seasonalTitleEl.style.display = 'none';
+
+  function showStandard(){
+    tabStandard.classList.add('active'); tabSeasonal.classList.remove('active');
+    seasonalListEl.style.display = 'none';
+    themeListEl.style.display = 'grid';
+    seasonalTitleEl.style.display = 'none';
+  }
+  function showSeasonal(){
+    tabStandard.classList.remove('active'); tabSeasonal.classList.add('active');
+    seasonalListEl.style.display = 'grid';
+    themeListEl.style.display = 'none';
+    seasonalTitleEl.style.display = 'block';
+  }
+  tabStandard.addEventListener('click', showStandard);
+  tabSeasonal.addEventListener('click', showSeasonal);
+  // na start pokaż standardowe
+  showStandard();
+
   function applyTheme(key){
     const t = THEMES[key];
     if(!t) return;
@@ -584,6 +635,7 @@ try{
     root.setProperty('--quote-grad-start', t.start);
     root.setProperty('--quote-grad-end', t.end);
     root.setProperty('--accent', t.accent || t.start);
+    root.setProperty('--text-shadow', t.textShadow || 'none');
     if (isDarkColor(t.bg)) {
       root.setProperty('--glass-border', 'rgba(255,255,255,0.08)');
     } else {
