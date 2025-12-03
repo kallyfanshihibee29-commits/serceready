@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Serce Gotowe — Księga (lista 2 w rzędzie)</title>
+<title>Serce Gotowe — Księga (lista 2 w rzędzie) — Unowocześnione</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 
@@ -16,7 +16,16 @@
     --quote-grad-end: #5a8dee;
     --accent: #2b7bd6;
     --glass-border: rgba(255,255,255,0.36);
-    --text-shadow: none; 
+    --text-shadow: none;
+
+    /* kontrola koloru tekstu aplikacji — domyślnie korzysta z navy */
+    --body-text: var(--navy);
+
+    /* animacje i timing */
+    --ease-out: cubic-bezier(.2,.9,.25,1);
+    --ui-duration: 260ms;
+    --ui-duration-slow: 520ms; /* wydłużone, żeby animacje były bardziej miękkie i widoczne */
+    --stagger: 72ms;
   }
 
   html,body{height:100%;margin:0;font-family:Roboto,system-ui,-apple-system,"Segoe UI",Arial;}
@@ -26,17 +35,28 @@
     background-attachment: fixed;
     background-size: 100% 100vh;
     min-height: 100vh;
-    color:var(--navy);
+    color:var(--body-text);
     -webkit-font-smoothing:antialiased;
   }
-  @media (max-width:420px){
-    body{ background-attachment: scroll; background-size: 100% 200vh; }
-  }
+  @media (max-width:420px){ body{ background-attachment: scroll; background-size: 100% 200vh; } }
 
   .container{max-width:720px;margin:18px auto;padding:18px;}
-  header{text-align:center;margin-bottom:32px;}
-  .title{font-family:Pacifico,cursive;font-size:36px;color:var(--navy);margin:0;line-height:1;position:relative;z-index:1}
+  @media (max-width:520px){ .container{ padding:12px; margin:12px auto; } }
 
+  header{text-align:center;margin-bottom:24px;}
+  .title{font-family:Pacifico,cursive;font-size:clamp(26px,6vw,36px);color:var(--navy);margin:0;line-height:1;position:relative;z-index:1}
+
+  /* -------------------------------------------------- */
+  /*    Intensywniejsza animacja wejścia: w lewo + blur  */
+  /* -------------------------------------------------- */
+  @keyframes stretchIn {
+    0%{ transform: translateX(-28px) scaleX(.72) skewX(-4deg); opacity:0; filter: blur(8px); }
+    60%{ transform: translateX(8px) scaleX(1.08) skewX(1deg); opacity:1; filter: blur(2px); }
+    100%{ transform: translateX(0) scaleX(1) skewX(0deg); opacity:1; filter: blur(0); }
+  }
+  .start-anim{ animation: stretchIn var(--ui-duration-slow) var(--ease-out) both; transform-origin: left center; will-change: transform, opacity, filter; }
+
+  /* karta główna */
   .card{background:rgba(255,255,255,0.95);border-radius:16px;padding:16px;box-shadow:0 8px 20px rgba(6,21,52,0.12);border:1px solid rgba(30,58,138,0.06)}
   .draw-area{display:flex;flex-direction:column;gap:12px;align-items:center}
 
@@ -51,16 +71,22 @@
     border:1px solid rgba(30,58,138,0.04);
     overflow:hidden;
     position:relative;
+    transition:box-shadow var(--ui-duration) var(--ease-out), transform var(--ui-duration) var(--ease-out);
   }
-  .preview img{max-width:70%;max-height:80%;object-fit:contain;border-radius:8px;transition:transform .3s ease,filter .45s ease;display:block;margin:auto}
-  .preview img.dimmed{filter:brightness(0.35) grayscale(0.15)}
-  .preview .placeholder{font-weight:700;color:var(--navy);text-align:center;padding:12px}
-  .preview .preview-overlay{position:absolute;opacity:0;display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:rgba(0,0,0,0.45);color:white;font-weight:900;font-size:32px;text-shadow:0 6px 10px rgba(0,0,0,0.45);pointer-events:none;transition:opacity .45s ease}
-  .preview.show-overlay .preview-overlay{display:flex;opacity:1}
+  .preview:before{ content:''; position:absolute; inset:0; pointer-events:none; background:linear-gradient(120deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.02) 35%, rgba(255,255,255,0.02) 100%); mix-blend-mode: overlay; }
+  .preview:hover{ transform:translateY(-4px); box-shadow:0 20px 50px rgba(6,21,52,0.14); }
 
+  .preview img{max-width:70%;max-height:80%;object-fit:contain;border-radius:8px;transition:transform .3s ease,filter .45s ease,opacity .22s ease;display:block;margin:auto}
+  .preview img.dimmed{filter:brightness(0.35) grayscale(0.15)}
+  .preview .placeholder{font-weight:700;color:var(--body-text);text-align:center;padding:12px}
+  .preview .preview-overlay{position:absolute;opacity:0;display:flex;align-items:center;justify-content:center;width:72px;height:72px;border-radius:50%;background:rgba(0,0,0,0.45);color:white;font-weight:900;font-size:32px;text-shadow:0 6px 10px rgba(0,0,0,0.45);pointer-events:none;transition:opacity .45s var(--ease-out), transform .45s var(--ease-out)}
+  .preview.show-overlay .preview-overlay{display:flex;opacity:1;transform:scale(1.03)}
+
+  /* controls */
   .controls{display:flex;width:100%;gap:10px;align-items:center}
-  .btn{flex:1;border:none;padding:12px 14px;border-radius:12px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));color:#fff}
-  .btn.ghost{background:#fff;border:2px solid rgba(30,58,138,0.12);color:var(--navy);box-shadow:none}
+  .btn{flex:1;border:none;padding:12px 14px;border-radius:12px;font-weight:700;cursor:pointer;background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));color:#fff;transition:transform var(--ui-duration) var(--ease-out), box-shadow var(--ui-duration) var(--ease-out)}
+  .btn:active{ transform:translateY(1px) }
+  .btn.ghost{background:#fff;border:2px solid rgba(30,58,138,0.12);color:var(--body-text);box-shadow:none}
   .btn.inactive{background: #cbd5e1; color: rgba(5,32,63,0.7); cursor:default}
 
   .btn.book{background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));border-radius:14px;padding:12px 16px;border:1px solid rgba(0,0,0,0.06);display:inline-flex;align-items:center;gap:10px;justify-content:center;box-shadow:0 10px 24px rgba(30,58,138,0.08);color:#fff;font-weight:900;transition:transform .16s ease,box-shadow .16s ease}
@@ -68,326 +94,120 @@
   .btn.book:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(30,58,138,0.16)}
   @media (max-width:420px){ .btn.book{width:100%} }
 
+  /* countdowns */
   .countdowns-grid{display:flex;gap:10px;flex-wrap:wrap;align-items:stretch}
-  .countdown-card{flex:0 0 calc(50% - 5px);max-width:calc(50% - 5px);box-sizing:border-box;min-width:120px;background:linear-gradient(180deg,#ffffff,#f7fbff);border-radius:10px;padding:10px;border:1px solid rgba(30,58,138,0.06);box-shadow:0 6px 14px rgba(6,21,52,0.06);text-align:center}
-  .countdown-label{font-size:12px;font-weight:700;color:rgba(5,32,63,0.7)}
-  .countdown-value{font-variant-numeric:tabular-nums;font-weight:900;color:var(--navy);font-size:18px;margin-top:6px}
+  .countdown-card{flex:0 0 calc(50% - 5px);max-width:calc(50% - 5px);box-sizing:border-box;min-width:120px;background:linear-gradient(180deg,#ffffff,#f7fbff);border-radius:10px;padding:10px;border:1px solid rgba(30,58,138,0.06);box-shadow:0 6px 14px rgba(6,21,52,0.06);text-align:center;transition:transform .22s var(--ease-out), box-shadow .22s var(--ease-out)}
+  .countdown-card:hover{ transform: translateY(-6px); box-shadow:0 20px 40px rgba(6,21,52,0.08) }
+  .countdown-label{font-size:12px;font-weight:700;color:var(--body-text)}
+  .countdown-value{font-variant-numeric:tabular-nums;font-weight:900;color:var(--body-text);font-size:18px;margin-top:6px}
   .countdown-sub{font-size:12px;color:rgba(5,32,63,0.6);margin-top:6px}
 
-  .caption{font-weight:700;color:var(--navy);text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;padding:8px 6px}
+  .caption{font-weight:700;color:var(--body-text);text-align:center;min-height:48px;display:flex;align-items:center;justify-content:center;padding:8px 6px}
   .cooldowns{display:flex;flex-direction:column;gap:8px;margin-top:8px}
-  .tiny{font-size:12px;font-weight:700;color:rgba(5,32,63,0.7)}
+  .tiny{font-size:12px;font-weight:700;color:var(--body-text)}
   .book-area{margin-top:12px;display:flex;gap:8px;align-items:center;justify-content:center}
 
-  .modal-backdrop{
-    position:fixed;
-    inset:0;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    z-index:2000;
-    padding:14px;
-    background: transparent;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
+  /* modal + glass (zachowano glass) - teraz z wejściem od lewej + blur */
+  .modal-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:2000; padding:14px; background: transparent; backdrop-filter: blur(2px) saturate(110%); }
   .modal-backdrop.show{display:flex}
 
-  .modal{
-    width:100%;
-    max-width:560px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid var(--glass-border);
-    border-radius:14px;
-    box-shadow:
-      0 8px 24px rgba(6,21,52,0.10),
-      inset 0 1px 0 rgba(255,255,255,0.6);
-    backdrop-filter: blur(30px) saturate(120%);
-    -webkit-backdrop-filter: blur(30px) saturate(120%);
-    position:relative;
-    overflow:visible;
-    max-height: calc(100vh - 40px);
-    display:flex;
-    flex-direction:column;
-    transition: background .22s ease, box-shadow .22s ease, border .22s ease;
-  }
+  @keyframes modalIn { 0%{ transform: translateX(-18px) scale(.98); opacity:0; filter: blur(8px); } 100%{ transform: translateX(0) scale(1); opacity:1; filter: blur(0); } }
+  .modal{ width:100%; max-width:560px; background: rgba(255,255,255,0.06); border: 1px solid var(--glass-border); border-radius:14px; box-shadow: 0 8px 24px rgba(6,21,52,0.10), inset 0 1px 0 rgba(255,255,255,0.6); backdrop-filter: blur(30px) saturate(120%); position:relative; overflow:visible; max-height: calc(100vh - 40px); display:flex; flex-direction:column; transition: transform var(--ui-duration-slow) var(--ease-out), opacity var(--ui-duration) var(--ease-out); transform: translateY(18px); opacity:0 }
+  .modal.show { transform: translateY(0); opacity:1; animation: modalIn var(--ui-duration-slow) var(--ease-out) both }
   .modal.short-modal{ max-height: 60vh; }
 
   .modal-inner{padding:14px; position: relative; z-index: 10; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius: 12px;}
   .modal-header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-  .modal-title{font-family:Pacifico;color:var(--navy);font-size:22px;margin:0}
+  .modal-title{font-family:Pacifico;color:var(--body-text);font-size:22px;margin:0}
 
   .mission{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
-  .mission-title{font-weight:700;font-size:13px;color:var(--navy)}
+  .mission-title{font-weight:700;font-size:13px;color:var(--body-text)}
   .mission-row{display:flex;align-items:center;gap:8px}
-  .mission-count{font-weight:900;color:var(--navy);background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));color:#fff;padding:6px 10px;border-radius:12px;font-size:13px;box-shadow:0 8px 18px rgba(30,58,138,0.12)}
+  .mission-count{font-weight:900;color:var(--body-text);background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));color:#fff;padding:6px 10px;border-radius:12px;font-size:13px;box-shadow:0 8px 18px rgba(30,58,138,0.12)}
   .mission-badge{font-size:18px;margin-left:4px}
   .mission-small{font-size:12px;color:rgba(5,32,63,0.65);margin-top:2px}
 
-  .close{border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--navy)}
+  .close{border:none;background:transparent;font-size:20px;cursor:pointer;color:var(--body-text)}
 
-  .modal-body{
-    width:100%;
-    overflow-y:auto;
-    overflow-x:hidden;
-    padding:12px 18px 18px 18px;
-    background: rgba(255,255,255,0.01);
-    box-sizing:border-box;
-    scroll-behavior:smooth;
-    scrollbar-width: auto;
-    -ms-overflow-style: auto;
-    flex:1;
-    min-height:0;
-  }
+  .modal-body{ width:100%; overflow-y:auto; overflow-x:hidden; padding:12px 18px 18px 18px; background: rgba(255,255,255,0.01); box-sizing:border-box; scroll-behavior:smooth; scrollbar-width: auto; -ms-overflow-style: auto; flex:1; min-height:0; }
 
-  .grid{
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap:12px;
-    justify-content:stretch;
-    align-content:flex-start;
-    max-width:520px;
-    margin:0 auto;
-    box-sizing:border-box;
-    width:100%;
-  }
-  .cardItem{
-    box-sizing:border-box;
-    background:#fff;
-    border-radius:10px;
-    border:1px solid rgba(30,58,138,0.04);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    gap:8px;
-    padding:10px;
-    overflow:visible;
-    min-width:0;
-    text-align:center;
-  }
-  .imgWrap{
-    width:100%;
-    aspect-ratio:1/1;
-    max-width:220px;
-    position:relative;
-    overflow:hidden;
-    border-radius:8px;
-    background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end));
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:6px;
-    box-sizing:border-box;
-    margin:0 auto;
-  }
-  .cardItem img{max-width:90%;max-height:90%;object-fit:contain;border-radius:6px;transition:filter .18s ease,transform .18s ease;background:transparent;display:block;margin:auto}
-  .cardItem.dimmed img{filter:brightness(0.35) grayscale(0.15)}
-  .imgWrap .overlay{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-weight:900;font-size:48px;color:rgba(255,255,255,0.95);pointer-events:none;display:none;align-items:center;justify-content:center;text-shadow:0 6px 10px rgba(0,0,0,0.45)}
-  .cardItem.dimmed .imgWrap .overlay{display:flex;background:rgba(0,0,0,0.45);width:72px;height:72px;border-radius:50%;font-size:36px}
-  .cardItem .name{font-weight:900;color:var(--navy);text-align:center;font-size:14px;margin-top:6px;word-break:break-word}
-  .cardItem .desc{font-size:12px;color:rgba(5,32,63,0.8);text-align:center;padding:6px 4px;word-break:break-word}
+  /* grid + items - teraz wjeżdżają z lewej z blur i delikatnym scale */
+  .grid{ display:grid; grid-template-columns: repeat(2, 1fr); gap:12px; justify-content:stretch; align-content:flex-start; max-width:520px; margin:0 auto; box-sizing:border-box; width:100%; }
+  .cardItem{ box-sizing:border-box; background:#fff; border-radius:10px; border:1px solid rgba(30,58,138,0.04); display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:8px; padding:10px; overflow:visible; min-width:0; text-align:center; transform: translateX(-18px) scale(.96); opacity:0; filter: blur(6px); transition: transform .42s var(--ease-out), opacity .42s var(--ease-out), box-shadow .2s var(--ease-out), filter .42s var(--ease-out) }
+  .cardItem.revealed{ transform: translateX(0) scale(1); opacity:1; filter: blur(0) }
+  .cardItem:hover{ box-shadow: 0 18px 40px rgba(6,21,52,0.07); transform: translateY(-6px) scale(1.01) }
 
-  @media (max-width:420px){
-    .modal{max-width:100%; margin:8px; padding-right:8px; border-radius:12px;}
-    .preview{height:140px}
-    .preview img{max-width:70%}
-    .countdown-card{padding:8px;flex:1 1 100%}
-    .countdown-value{font-size:16px}
-    .cardItem{padding:8px}
-    .imgWrap{padding:4px; max-width:180px}
-    .cardItem .name{font-size:13px}
-    .cardItem .desc{font-size:11px}
-    .mission{align-items:flex-start;min-width:0}
-    .modal-header{gap:8px}
-    .controls{flex-direction:column;align-items:stretch}
-    .controls .btn{width:100%}
-    .grid{grid-template-columns: repeat(2, 1fr); gap:12px; padding:6px;}
-    .modal{max-height: calc(100vh - 24px);}    
-    .modal.short-modal{ max-height: 50vh; }
-    .modal-body{padding-bottom:28px;}
-  }
+  .imgWrap{ width:100%; aspect-ratio:1/1; max-width:220px; position:relative; overflow:hidden; border-radius:8px; background:linear-gradient(90deg,var(--quote-grad-start),var(--quote-grad-end)); display:flex; align-items:center; justify-content:center; padding:6px; box-sizing:border-box; margin:0 auto; transition: transform .22s var(--ease-out) }
+  .imgWrap img{ max-width:90%; max-height:90%; object-fit:contain; border-radius:6px; transition:filter .18s ease,transform .18s ease,opacity .22s ease; background:transparent; display:block; margin:auto }
+  .cardItem.dimmed .imgWrap img{ filter:brightness(0.35) grayscale(0.15) }
+  .imgWrap .overlay{ position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); font-weight:900; font-size:48px; color:rgba(255,255,255,0.95); pointer-events:none; display:none; align-items:center; justify-content:center; text-shadow:0 6px 10px rgba(0,0,0,0.45) }
+  .cardItem.dimmed .imgWrap .overlay{ display:flex; background:rgba(0,0,0,0.45); width:72px; height:72px; border-radius:50%; font-size:36px }
 
-  img{max-width:100%;height:auto;-o-object-fit:contain}
+  .cardItem .name{ font-weight:900; color:var(--body-text); text-align:center; font-size:14px; margin-top:6px; word-break:break-word }
+  .cardItem .desc{ font-size:12px; color:rgba(5,32,63,0.8); text-align:center; padding:6px 4px; word-break:break-word }
 
-  /* -----------------------------
-     SETTINGS BUTTON & PANEL (CENTERED)
-     ----------------------------- */
-  .settings-btn{
-    position:fixed;
-    right:18px;
-    top:50%;
-    transform:translateY(-50%);
-    width:56px;
-    height:56px;
-    border-radius:50%;
-    background: rgba(255,255,255,0.10);
-    border:1px solid rgba(255,255,255,0.18);
-    backdrop-filter: blur(10px) saturate(120%);
-    -webkit-backdrop-filter: blur(10px) saturate(120%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    z-index:3000;
-    box-shadow: 0 10px 30px rgba(2,6,23,0.12);
-    transition:transform .15s ease, box-shadow .15s ease, visibility .12s linear;
-    color:var(--navy);
-    font-size:20px;
-    line-height:1;
-    visibility: visible;
-  }
+  /* settings button & panel - gładniejsze wejście + blur -> pop-in */
+  .settings-btn{ position:fixed; right:18px; top:50%; transform:translateY(-50%); width:56px; height:56px; border-radius:50%; background: rgba(255,255,255,0.10); border:1px solid rgba(255,255,255,0.18); backdrop-filter: blur(10px) saturate(120%); -webkit-backdrop-filter: blur(10px) saturate(120%); display:flex; align-items:center; justify-content:center; cursor:pointer; z-index:3000; box-shadow: 0 10px 30px rgba(2,6,23,0.12); transition:transform .15s var(--ease-out), box-shadow .15s var(--ease-out), visibility .12s linear, right .22s var(--ease-out); color:var(--body-text); font-size:20px; line-height:1; visibility: visible; }
   .settings-btn:active{ transform:translateY(-50%) scale(.98); }
-  .settings-btn:focus{ outline:3px solid rgba(0,0,0,0.06); outline-offset:2px; }
 
-  /* ICON */
-  #settingsIcon{
-    display:inline-block;
-    font-size:20px;
-    line-height:1;
-    transition:opacity .18s ease, transform .18s ease;
-    opacity:1;
-    color:var(--navy);
-  }
+  #settingsIcon{ display:inline-block; font-size:20px; line-height:1; transition:opacity .18s ease, transform .18s ease; opacity:1; color:var(--body-text); }
 
-  /* BACKDROP: centrowanie panelu */
-  .settings-backdrop{
-    position:fixed;
-    inset:0;
-    display:none;
-    align-items:center;      /* <-- wyśrodkowanie pionowe */
-    justify-content:center;  /* <-- wyśrodkowanie poziome */
-    z-index:2999;
-    padding:18px;
-    background: transparent;
-  }
+  .settings-backdrop{ position:fixed; inset:0; display:none; align-items:center; justify-content:center; z-index:2999; padding:18px; background: transparent; }
   .settings-backdrop.show{ display:flex; }
 
-  .settings-panel{
-    width: min(520px,86vw);
-    max-width: calc(100% - 32px);
-    background: rgba(255,255,255,0.06);
-    border:1px solid var(--glass-border);
-    border-radius:12px;
-    padding:16px;
-    box-shadow: 0 12px 36px rgba(2,6,23,0.12);
-    backdrop-filter: blur(18px) saturate(120%);
-    -webkit-backdrop-filter: blur(18px) saturate(120%);
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    z-index:3000;
-    max-height: 82vh;
-    overflow: auto;
-    overflow-x: hidden;
-    box-sizing: border-box;
-    transition: max-height .36s cubic-bezier(.2,.9,.3,1), transform .18s ease;
-    transform: none;
-  }
-  .settings-panel.show {
-    max-height: 88vh;
-  }
+  @keyframes panelIn { 0%{ transform: translateX(18px) scale(.99); opacity:0; filter: blur(10px); } 100%{ transform: translateX(0) scale(1); opacity:1; filter: blur(0); } }
+  .settings-panel{ width: min(520px,86vw); max-width: calc(100% - 32px); background: rgba(255,255,255,0.06); border:1px solid var(--glass-border); border-radius:12px; padding:16px; box-shadow: 0 12px 36px rgba(2,6,23,0.12); backdrop-filter: blur(18px) saturate(120%); -webkit-backdrop-filter: blur(18px) saturate(120%); display:flex; flex-direction:column; gap:10px; z-index:3000; max-height: 82vh; overflow: auto; overflow-x: hidden; box-sizing: border-box; transition: transform var(--ui-duration-slow) var(--ease-out), opacity var(--ui-duration) var(--ease-out); transform: translateX(12px) scale(.995); opacity:0 }
+  .settings-panel.show{ transform: translateX(0) scale(1); opacity:1; animation: panelIn var(--ui-duration-slow) var(--ease-out) both }
 
   .settings-panel .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
-  .settings-panel h3{margin:0;font-size:14px;color:var(--navy);font-weight:900}
+  .settings-panel h3{margin:0;font-size:14px;color:var(--body-text);font-weight:900}
 
-  .theme-list{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    gap:10px;
-    margin-top:8px;
-    max-height: calc( (82vh - 160px) );
-    overflow-y: auto;
-    padding-right:8px;
-    box-sizing: border-box;
-  }
+  .theme-list{ display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px; margin-top:8px; max-height: calc( (82vh - 160px) ); overflow-y: auto; padding-right:8px; box-sizing: border-box; opacity:1; transform: translateY(0); transition: opacity .28s var(--ease-out), transform .28s var(--ease-out); }
 
-  .theme-option{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:8px;
-    border-radius:10px;
-    border:1px solid rgba(0,0,0,0.04);
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    cursor:pointer;
-    min-height:48px;
-    text-align:left;
-    box-shadow: 0 6px 12px rgba(2,6,23,0.06);
-  }
+  /* theme-option: start blurred and slid right -> pop-in to position */
+  .theme-option{ display:flex; align-items:center; gap:8px; padding:8px; border-radius:10px; border:1px solid rgba(0,0,0,0.04); background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); cursor:pointer; min-height:48px; text-align:left; box-shadow: 0 6px 12px rgba(2,6,23,0.06); transform: translateX(10px) scale(.995); opacity:0; filter: blur(6px); transition: transform .38s var(--ease-out), opacity .38s var(--ease-out), box-shadow .22s var(--ease-out), filter .38s var(--ease-out); }
   .theme-option:focus{ outline:2px solid rgba(0,0,0,0.06); }
+  .theme-option.pop{ transform: translateX(0) scale(1); opacity:1; filter: blur(0); }
 
-  .swatch{
-    width:44px;
-    height:44px;
-    border-radius:50%;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.06);
-    flex-shrink:0;
-    border:2px solid rgba(0,0,0,0.06);
-    overflow:hidden;
-    position:relative;
-    display:block;
-    margin:0;
-    background: transparent;
-  }
-  .swatch .swatch-gradient{
-    position:absolute;
-    inset:4px;
-    border-radius:50%;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,0.06);
-  }
-  .swatch .swatch-accent{
-    position:absolute;
-    width:12px;
-    height:12px;
-    border-radius:50%;
-    right:6px;
-    bottom:6px;
-    border:2px solid rgba(255,255,255,0.92);
-    box-shadow: 0 2px 6px rgba(0,0,0,0.12);
-  }
-  .swatch .swatch-ring{
-    position:absolute;
-    inset:0;
-    border-radius:50%;
-    pointer-events:none;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.02) inset;
-  }
+  .swatch{ width:44px; height:44px; border-radius:50%; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.06); flex-shrink:0; border:2px solid rgba(0,0,0,0.06); overflow:hidden; position:relative; display:block; margin:0; background: transparent; transition: transform .22s var(--ease-out), box-shadow .22s var(--ease-out) }
+  .theme-option:hover .swatch{ transform: scale(1.08); box-shadow: 0 8px 22px rgba(6,21,52,0.08) }
+  .swatch .swatch-gradient{ position:absolute; inset:4px; border-radius:50%; box-shadow: inset 0 -3px 0 rgba(0,0,0,0.06); }
+  .swatch .swatch-accent{ position:absolute; width:12px; height:12px; border-radius:50%; right:6px; bottom:6px; border:2px solid rgba(255,255,255,0.92); box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
+  .swatch .swatch-ring{ position:absolute; inset:0; border-radius:50%; pointer-events:none; box-shadow: 0 0 0 2px rgba(255,255,255,0.02) inset; }
 
-  .theme-option .meta{font-size:13px;font-weight:700;color:var(--navy)}
-  .theme-option .sub{font-size:11px;font-weight:600;color:rgba(5,32,63,0.6)}
+  .theme-option .meta{ font-size:13px; font-weight:700; color:var(--body-text) }
+  .theme-option .sub{ font-size:11px; font-weight:600; color:rgba(5,32,63,0.6) }
 
-  .settings-footer{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:6px}
-  .text-muted{font-size:12px;color:rgba(5,32,63,0.6)}
-  .small-btn{padding:8px 10px;border-radius:10px;border:none;background:transparent;color:var(--navy);font-weight:700;cursor:pointer}
-  .small-btn.ghost{border:1px solid rgba(255,255,255,0.06);background:transparent}
-  .tab-btn{ padding:6px 8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--navy); font-weight:700; cursor:pointer; }
+  .settings-footer{ display:flex; gap:8px; align-items:center; justify-content:space-between; margin-top:6px }
+  .text-muted{ font-size:12px; color:rgba(5,32,63,0.6) }
+  .small-btn{ padding:8px 10px; border-radius:10px; border:none; background:transparent; color:var(--body-text); font-weight:700; cursor:pointer }
+  .small-btn.ghost{ border:1px solid rgba(255,255,255,0.06); background:transparent }
+  .tab-btn{ padding:6px 8px; border-radius:8px; border:1px solid rgba(255,255,255,0.04); background:transparent; color:var(--body-text); font-weight:700; cursor:pointer }
   .tab-btn.active{ background: linear-gradient(90deg, var(--quote-grad-start), var(--quote-grad-end)); color:#fff; border:none; box-shadow:0 8px 18px rgba(0,0,0,0.12); }
-  .small-btn.ghost{border:1px solid rgba(255,255,255,0.06);background:transparent}
-  @media (max-width:520px){
-    .settings-panel{ width: min(92vw,420px); max-width:calc(100% - 24px); max-height: 82vh; padding:12px; }
-    .settings-panel.show { max-height: 88vh; }
-    .theme-list{ grid-template-columns: repeat(1, 1fr); max-height: 60vh; padding-right:6px; }
-  }
-    .settings-panel.show { max-height: 58vh; }
-    .theme-list{ max-height: 34vh; }
-  }
 
-  @keyframes spinOut {
-    0% { transform: translateY(-50%) rotate(0deg) scale(1); opacity:1; }
-    70% { transform: translateY(-50%) rotate(300deg) scale(0.6); opacity:0.8; }
-    100% { transform: translateY(-50%) rotate(540deg) scale(0.2); opacity:0; }
-  }
+  @media (max-width:520px){ .settings-panel{ width: min(92vw,420px); max-width:calc(100% - 24px); max-height: 88vh; padding:12px; } .theme-list{ grid-template-columns: repeat(1, 1fr); max-height: 60vh; padding-right:6px; } }
+
+  /* drobne animacje ikonki ustawień (używane przez JS) */
+  @keyframes spinOut { 0% { transform: translateY(-50%) rotate(0deg) scale(1); opacity:1; } 70% { transform: translateY(-50%) rotate(300deg) scale(0.6); opacity:0.8; } 100% { transform: translateY(-50%) rotate(540deg) scale(0.2); opacity:0; } }
   .spin-out{ animation: spinOut 420ms cubic-bezier(.2,.9,.3,1) forwards; }
-
-  @keyframes spinIn {
-    0% { transform: translateY(-50%) rotate(-360deg) scale(0.25); opacity:0; }
-    70% { transform: translateY(-50%) rotate(20deg) scale(1.12); opacity:1; }
-    100% { transform: translateY(-50%) rotate(0deg) scale(1); opacity:1; }
-  }
+  @keyframes spinIn { 0% { transform: translateY(-50%) rotate(-360deg) scale(0.25); opacity:0; } 70% { transform: translateY(-50%) rotate(20deg) scale(1.12); opacity:1; } 100% { transform: translateY(-50%) rotate(0deg) scale(1); opacity:1; } }
   .spin-in{ display:flex !important; animation: spinIn 560ms cubic-bezier(.2,.9,.3,1) forwards; }
 
-  .seasonal-title { font-size:12px; font-weight:900; color:var(--navy); margin-top:6px }
+  .seasonal-title { font-size:12px; font-weight:900; color:var(--body-text); margin-top:6px }
+
+  /* shuffle micro animations */
+  @keyframes shuffleShake { 0%{ transform: translateY(0) rotate(0); } 50%{ transform: translateY(-4px) rotate(-1deg); } 100%{ transform: translateY(0) rotate(0); } }
+  .shuffling{ animation: shuffleShake .22s linear infinite }
+
+  /* mobile: grid pojedyncza kolumna */
+  @media (max-width:420px){ .grid { grid-template-columns: repeat(1, 1fr); } .countdown-card{ flex:1 1 100%; } .preview{ height:160px; } }
+
+  /* utilities for smooth switching */
+  .theme-list.fading-out{ opacity:0; transform: translateY(8px); pointer-events:none }
+  .theme-list.fading-in{ opacity:1; transform: translateY(0); }
+
+  /* utility */
+  .hidden{ display:none !important }
 </style>
 </head>
 <body>
@@ -396,35 +216,35 @@
       <h1 class="title">Serce Gotowe</h1>
     </header>
 
-    <section class="card draw-area" aria-labelledby="drawLabel">
-      <div class="preview" id="preview">
+    <section class="card draw-area start-anim" aria-labelledby="drawLabel">
+      <div class="preview start-anim" id="preview">
         <img id="centralImg" src="" alt="Czekoladka" draggable="false" style="display:none">
         <div class="placeholder" id="placeholderText">Wylosuj Czekoladkę na dziś</div>
         <div class="preview-overlay" id="previewOverlay">?</div>
       </div>
 
-      <div class="controls" style="width:100%;">
+      <div class="controls start-anim" style="width:100%;">
         <button id="drawBtn" class="btn">Wylosuj</button>
       </div>
 
-      <div class="caption" id="caption">Kliknij „Wylosuj”, aby otrzymać dzisiejszą misję.</div>
+      <div class="caption start-anim" id="caption">Kliknij „Wylosuj”, aby otrzymać dzisiejszą misję.</div>
 
       <div class="cooldowns" style="width:100%;">
         <div class="countdowns-grid">
-          <div class="countdown-card" id="drawCooldownCard" aria-live="polite">
+          <div class="countdown-card start-anim" id="drawCooldownCard" aria-live="polite">
             <div class="countdown-label">Następne losowanie</div>
             <div class="countdown-value" id="drawCountdown">—</div>
             <div class="countdown-sub tiny">możesz losować co 24h</div>
           </div>
 
-          <div class="countdown-card" id="dec24Card" aria-live="polite">
+          <div class="countdown-card start-anim" id="dec24Card" aria-live="polite">
             <div class="countdown-label">Do 24 grudnia</div>
             <div class="countdown-value" id="dec24">—</div>
             <div class="countdown-sub tiny">świętujemy 🎄</div>
           </div>
         </div>
       </div>
-      <div class="book-area">
+      <div class="book-area start-anim">
         <button id="openBook" class="btn book" style="width:100%;"><span class="icon">📖</span>Księga Czekoladek</button>
       </div>
     </section>
@@ -506,7 +326,6 @@ try{
     "beige": { name: "Beżowy", bg: "#f7f3e9", bg2: "#fdf9f1", navy: "#8b4513", start: "#e6d7c3", end: "#d4b896", accent: "#c19a6b" },
     "latte": { name: "Spienione latte", bg: "#d4b896", bg2: "#e8d5b7", navy: "#5d4037", start: "#8d6e63", end: "#6d4c41", accent: "#795548" },
 
-    /* --- nowe motywy dostarczone przez użytkownika --- */
     "mustard": { name: "Musztardowy", bg: "#d4a574", bg2: "#e8c9a1", navy: "#5a3e1b", start: "#b8860b", end: "#daa520", accent: "#996515" },
     "yellow": { name: "Żółty", bg: "#fef08a", bg2: "#fef9c3", navy: "#713f12", start: "#eab308", end: "#facc15", accent: "#ca8a04" },
     "granatowy": { name: "Granatowy", bg: "#93c5fd", bg2: "#bfdbfe", navy: "#1e3a8a", start: "#1e40af", end: "#1e3a8a", accent: "#1d4ed8" },
@@ -515,17 +334,16 @@ try{
     "snow_storm": { name: "Śnieżna Zadyma", bg: "#e0f2fe", bg2: "#f0f9ff", navy: "#0c4a6e", start: "#0ea5e9", end: "#38bdf8", accent: "#0284c7", textShadow: "none" }
   };
 
-  // Kolejność tęczowa — od czerwieni/pink przez pomarańcz/żółć, zielenie, turkusy, niebieskie do fioleów i neutralnych
   const STANDARD_ORDER = [
-    "pink","light-rose",           // róż / czerwień
-    "pumpkin","orange",            // pomarańcz
-    "mustard","yellow",            // musztarda / żółty
-    "beige","latte",               // ciepłe neutralne
-    "green","moldy-green",         // zielenie
-    "turquoise","light-blue",      // turkus / jasny błękit
-    "blue","granatowy",            // niebieskie
-    "plum","purple",               // fioletowe
-    "gray","bw"                    // szarości / czarno-białe
+    "pink","light-rose",
+    "pumpkin","orange",
+    "mustard","yellow",
+    "beige","latte",
+    "green","moldy-green",
+    "turquoise","light-blue",
+    "blue","granatowy",
+    "plum","purple",
+    "gray","bw"
   ];
   const THEME_KEY = 'sg_theme_v1';
 
@@ -571,186 +389,92 @@ try{
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
       hideSettings();
-      setTimeout(()=>{
-        applyTheme(key);
-        animateButtonIn();
-      }, 180);
+      setTimeout(()=>{ applyTheme(key); animateButtonIn(); }, 180);
     });
 
     btn.addEventListener('keydown', (e)=>{
-      if(e.key === 'Enter' || e.key === ' '){
-        e.preventDefault();
-        btn.click();
-      }
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); btn.click(); }
     });
 
     return btn;
   }
 
-  STANDARD_ORDER.forEach(k=>{
-    if(!THEMES[k]) return;
-    themeListEl.appendChild(createOptionElement(k));
-  });
+  STANDARD_ORDER.forEach(k=>{ if(!THEMES[k]) return; themeListEl.appendChild(createOptionElement(k)); });
 
-  // --- zakładka "Kolory Sezonowe" ---
   const seasonalKeys = ['holiday_harmony','snow_storm'];
   const seasonalListEl = document.getElementById('seasonalList');
-  seasonalKeys.forEach(k=>{
-    if(!THEMES[k]) return;
-    seasonalListEl.appendChild(createOptionElement(k));
-  });
+  seasonalKeys.forEach(k=>{ if(!THEMES[k]) return; seasonalListEl.appendChild(createOptionElement(k)); });
 
-  // ustawienia przełącznika zakładek
   const tabStandard = document.getElementById('tabStandard');
   const tabSeasonal = document.getElementById('tabSeasonal');
   const seasonalTitleEl = document.querySelector('.seasonal-title');
-  // ukryj sezonowe domyślnie
-  seasonalListEl.style.display = 'none';
-  seasonalTitleEl.style.display = 'none';
+  seasonalListEl.style.display = 'none'; seasonalTitleEl.style.display = 'none';
+
+  function popOptions(listEl){
+    const opts = listEl.querySelectorAll('.theme-option');
+    // reset to initial state so animation can replay reliably
+    opts.forEach(o=>{ o.classList.remove('pop'); });
+    opts.forEach((o,i)=>{ setTimeout(()=>{ o.classList.add('pop'); }, i*parseInt(getComputedStyle(document.documentElement).getPropertyValue('--stagger'))); });
+  }
 
   function showStandard(){
     tabStandard.classList.add('active'); tabSeasonal.classList.remove('active');
-    seasonalListEl.style.display = 'none';
-    themeListEl.style.display = 'grid';
-    seasonalTitleEl.style.display = 'none';
+    seasonalListEl.style.display = 'none'; themeListEl.style.display = 'grid'; seasonalTitleEl.style.display = 'none';
+    // odtwórz animację wejścia dla opcji jak przy otwarciu panelu
+    setTimeout(()=> popOptions(themeListEl), 100);
   }
   function showSeasonal(){
     tabStandard.classList.remove('active'); tabSeasonal.classList.add('active');
-    seasonalListEl.style.display = 'grid';
-    themeListEl.style.display = 'none';
-    seasonalTitleEl.style.display = 'block';
+    seasonalListEl.style.display = 'grid'; themeListEl.style.display = 'none'; seasonalTitleEl.style.display = 'block';
+    setTimeout(()=> popOptions(seasonalListEl), 100);
   }
   tabStandard.addEventListener('click', showStandard);
   tabSeasonal.addEventListener('click', showSeasonal);
-  // na start pokaż standardowe
   showStandard();
 
   function applyTheme(key){
-    const t = THEMES[key];
-    if(!t) return;
-    const root = document.documentElement.style;
-    root.setProperty('--bg', t.bg);
-    root.setProperty('--bg2', t.bg2);
-    root.setProperty('--navy', t.navy);
-    root.setProperty('--quote-grad-start', t.start);
-    root.setProperty('--quote-grad-end', t.end);
-    root.setProperty('--accent', t.accent || t.start);
-    root.setProperty('--text-shadow', t.textShadow || 'none');
-    if (isDarkColor(t.bg)) {
-      root.setProperty('--glass-border', 'rgba(255,255,255,0.08)');
+    const t = THEMES[key]; if(!t) return; const root = document.documentElement.style;
+    root.setProperty('--bg', t.bg); root.setProperty('--bg2', t.bg2); root.setProperty('--navy', t.navy); root.setProperty('--quote-grad-start', t.start); root.setProperty('--quote-grad-end', t.end); root.setProperty('--accent', t.accent || t.start); root.setProperty('--text-shadow', t.textShadow || 'none');
+    if(key === 'holiday_harmony'){
+      root.setProperty('--body-text', t.start);
     } else {
-      root.setProperty('--glass-border', 'rgba(255,255,255,0.36)');
+      root.setProperty('--body-text', t.navy || 'var(--navy)');
     }
+    if (isDarkColor(t.bg)) { root.setProperty('--glass-border', 'rgba(255,255,255,0.08)'); } else { root.setProperty('--glass-border', 'rgba(255,255,255,0.36)'); }
     try{ localStorage.setItem(THEME_KEY, key); }catch(e){}
     updateSettingsBtnColor();
   }
 
-  function resetTheme(){
-    try{ localStorage.removeItem(THEME_KEY); }catch(e){}
-    applyTheme('blue');
-    animateButtonIn();
-  }
+  function resetTheme(){ try{ localStorage.removeItem(THEME_KEY); }catch(e){} applyTheme('blue'); animateButtonIn(); }
 
-  function loadSavedTheme(){
-    try{
-      const saved = localStorage.getItem(THEME_KEY);
-      if(saved && THEMES[saved]) { applyTheme(saved); return; }
-    }catch(e){}
-    applyTheme('blue');
-  }
+  function loadSavedTheme(){ try{ const saved = localStorage.getItem(THEME_KEY); if(saved && THEMES[saved]) { applyTheme(saved); return; } }catch(e){} applyTheme('blue'); }
 
-  function isDarkColor(hex){
-    try{
-      const c = hex.replace('#','');
-      const r = parseInt(c.substring(0,2),16);
-      const g = parseInt(c.substring(2,4),16);
-      const b = parseInt(c.substring(4,6),16);
-      const lum = 0.2126*r + 0.7152*g + 0.0722*b;
-      return lum < 160;
-    }catch(e){ return false; }
-  }
+  function isDarkColor(hex){ try{ const c = hex.replace('#',''); const r = parseInt(c.substring(0,2),16); const g = parseInt(c.substring(2,4),16); const b = parseInt(c.substring(4,6),16); const lum = 0.2126*r + 0.7152*g + 0.0722*b; return lum < 160; }catch(e){ return false; } }
 
-  function updateSettingsBtnColor(){
-    const nav = getComputedStyle(document.documentElement).getPropertyValue('--navy').trim();
-    // ustawiamy kolor zarówno na przycisk jak i na ikonę, na wszelki wypadek
-    try{ settingsBtn.style.color = nav || 'var(--navy)'; }catch(e){}
-    try{ if(settingsIcon) settingsIcon.style.color = nav || 'var(--navy)'; }catch(e){}
-  }
+  function updateSettingsBtnColor(){ const bodyText = getComputedStyle(document.documentElement).getPropertyValue('--body-text').trim(); try{ settingsBtn.style.color = bodyText || 'var(--body-text)'; }catch(e){} try{ if(settingsIcon) settingsIcon.style.color = bodyText || 'var(--body-text)'; }catch(e){} }
 
   const closeSettings = document.getElementById('closeSettings');
   const resetBtn = document.getElementById('resetTheme');
 
-  function showSettings(){
-    if(!settingsBackdrop) return;
-    settingsBackdrop.classList.add('show');
-    settingsBackdrop.setAttribute('aria-hidden','false');
-    settingsPanel.setAttribute('aria-hidden','false');
-    settingsBtn.setAttribute('aria-expanded','true');
-    settingsPanel.classList.add('show');
-    const first = settingsPanel.querySelector('.theme-option');
-    if(first) first.focus();
-    setTimeout(()=>{ document.addEventListener('click', outsideClick); }, 50);
+  function showSettings(){ if(!settingsBackdrop) return; settingsBackdrop.classList.add('show'); settingsBackdrop.setAttribute('aria-hidden','false'); settingsPanel.setAttribute('aria-hidden','false'); settingsBtn.setAttribute('aria-expanded','true'); settingsPanel.classList.add('show'); // dodajemy pop-in animacje dla opcji
+    setTimeout(()=> popOptions(settingsPanel.querySelector('.theme-list')), 120);
+    const first = settingsPanel.querySelector('.theme-option'); if(first) first.focus(); setTimeout(()=>{ document.addEventListener('click', outsideClick); }, 50);
   }
-  function hideSettings(){
-    if(!settingsBackdrop) return;
-    settingsBackdrop.classList.remove('show');
-    settingsBackdrop.setAttribute('aria-hidden','true');
-    settingsPanel.setAttribute('aria-hidden','true');
-    settingsBtn.setAttribute('aria-expanded','false');
-    settingsPanel.classList.remove('show');
+  function hideSettings(){ if(!settingsBackdrop) return; settingsBackdrop.classList.remove('show'); settingsBackdrop.setAttribute('aria-hidden','true'); settingsPanel.setAttribute('aria-hidden','true'); settingsBtn.setAttribute('aria-expanded','false'); settingsPanel.classList.remove('show'); // usuń klasy pop, by móc odtwarzać animację przy ponownym otwarciu
+    const opts = settingsPanel.querySelectorAll('.theme-option'); opts.forEach(o=>o.classList.remove('pop'));
     document.removeEventListener('click', outsideClick);
-
-    // przy zamknięciu przywracamy widoczność przycisku i ikonę (bez czekania na wybór motywu)
-    animateButtonIn();
-
-    setTimeout(()=>{
-      try{ if(settingsBtn.style.display !== 'none') settingsBtn.focus(); }catch(e){}
-    }, 320);
+    animateButtonIn(); setTimeout(()=>{ try{ if(settingsBtn.style.display !== 'none') settingsBtn.focus(); }catch(e){} }, 320);
   }
-  function outsideClick(e){
-    if(!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) hideSettings();
-  }
+  function outsideClick(e){ if(!settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) hideSettings(); }
 
-  function animateButtonOutAndShowPanel(){
-    // animujemy ikonę w dół i chowamy wizualnie (visibility), ale nie usuwamy struktury DOM
-    settingsBtn.classList.remove('spin-in');
-    settingsBtn.classList.add('spin-out');
-    settingsBtn.style.pointerEvents = 'none';
-    if(settingsIcon) settingsIcon.style.opacity = '0';
-    setTimeout(()=>{
-      // zamiast display:none — używamy visibility, łatwiej przywrócić ikonę i unikamy "pustego" przycisku
-      settingsBtn.style.visibility = 'hidden';
-      settingsBtn.classList.remove('spin-out');
-      settingsBtn.style.pointerEvents = '';
-      showSettings();
-    }, 420);
-  }
+  function animateButtonOutAndShowPanel(){ settingsBtn.classList.remove('spin-in'); settingsBtn.classList.add('spin-out'); settingsBtn.style.pointerEvents = 'none'; if(settingsIcon) settingsIcon.style.opacity = '0'; setTimeout(()=>{ settingsBtn.style.visibility = 'hidden'; settingsBtn.classList.remove('spin-out'); settingsBtn.style.pointerEvents = ''; showSettings(); }, 420); }
 
-  function animateButtonIn(){
-    // przywracamy widoczność i ikonę, odpalamy animację wejścia
-    settingsBtn.style.visibility = 'visible';
-    settingsBtn.style.display = 'flex';
-    settingsBtn.classList.remove('spin-out');
-    if(settingsIcon) settingsIcon.style.opacity = '0';
-    setTimeout(()=>{
-      settingsBtn.classList.add('spin-in');
-      // stopniowo pokazujemy ikonę w czasie animacji
-      setTimeout(()=>{ if(settingsIcon) settingsIcon.style.opacity = '1'; }, 120);
-      setTimeout(()=>{ settingsBtn.classList.remove('spin-in'); }, 700);
-    }, 40);
-  }
+  function animateButtonIn(){ settingsBtn.style.visibility = 'visible'; settingsBtn.style.display = 'flex'; settingsBtn.classList.remove('spin-out'); if(settingsIcon) settingsIcon.style.opacity = '0'; setTimeout(()=>{ settingsBtn.classList.add('spin-in'); setTimeout(()=>{ if(settingsIcon) settingsIcon.style.opacity = '1'; }, 120); setTimeout(()=>{ settingsBtn.classList.remove('spin-in'); }, 700); }, 40); }
 
-  settingsBtn.addEventListener('click', (e)=>{
-    e.stopPropagation();
-    if(settingsBackdrop && settingsBackdrop.classList.contains('show')){ hideSettings(); return; }
-    animateButtonOutAndShowPanel();
-  });
+  settingsBtn.addEventListener('click', (e)=>{ e.stopPropagation(); if(settingsBackdrop && settingsBackdrop.classList.contains('show')){ hideSettings(); return; } animateButtonOutAndShowPanel(); });
   closeSettings.addEventListener('click', hideSettings);
   resetBtn.addEventListener('click', resetTheme);
-
-  settingsBtn.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if(settingsBackdrop && settingsBackdrop.classList.contains('show')) hideSettings(); else animateButtonOutAndShowPanel(); }
-  });
+  settingsBtn.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); if(settingsBackdrop && settingsBackdrop.classList.contains('show')) hideSettings(); else animateButtonOutAndShowPanel(); } });
 
   const ITEMS_COUNT = 18;
   const DISC_KEY = 'sg_discovered_v1';
@@ -774,21 +498,7 @@ try{
   function safeGet(key){ try{ return localStorage.getItem(key); }catch(e){ return null; } }
   function safeSet(key,val){ try{ localStorage.setItem(key,val); }catch(e){ console.warn('localStorage set failed',e); } }
 
-  function loadDiscovered(){
-    try{
-      const raw = safeGet(DISC_KEY);
-      if(!raw) return Array(ITEMS_COUNT).fill(false);
-      const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed) && parsed.length===ITEMS_COUNT) return parsed.map(Boolean);
-      // if saved data is for previous smaller set, keep previous discoveries and add false for new items
-      if(Array.isArray(parsed) && parsed.length < ITEMS_COUNT){
-        const copy = parsed.map(Boolean);
-        while(copy.length < ITEMS_COUNT) copy.push(false);
-        return copy;
-      }
-      return Array(ITEMS_COUNT).fill(false);
-    }catch(e){ return Array(ITEMS_COUNT).fill(false); }
-  }
+  function loadDiscovered(){ try{ const raw = safeGet(DISC_KEY); if(!raw) return Array(ITEMS_COUNT).fill(false); const parsed = JSON.parse(raw); if(Array.isArray(parsed) && parsed.length===ITEMS_COUNT) return parsed.map(Boolean); if(Array.isArray(parsed) && parsed.length < ITEMS_COUNT){ const copy = parsed.map(Boolean); while(copy.length < ITEMS_COUNT) copy.push(false); return copy; } return Array(ITEMS_COUNT).fill(false); }catch(e){ return Array(ITEMS_COUNT).fill(false); } }
   function saveDiscovered(){ safeSet(DISC_KEY, JSON.stringify(discovered)); }
   function loadLastDraw(){ try{ const raw = safeGet(LAST_KEY); if(!raw) return null; const d=new Date(raw); return isNaN(d)?null:d; }catch(e){ return null; } }
   function saveLastDraw(d){ try{ safeSet(LAST_KEY, d.toISOString()); }catch(e){} }
@@ -801,26 +511,7 @@ try{
 
   function randomInt(max){ return Math.floor(Math.random()*max); }
 
-  function tryImageSources(imgEl, index){
-    if(!imgEl) return;
-    const candidates = [
-      `zdjęcie_${index+1}.png`,
-      `zdjecie_${index+1}.png`,
-      `zdjecie-${index+1}.png`,
-      `images/zdjęcie_${index+1}.png`,
-      `images/zdjecie_${index+1}.png`
-    ];
-    let tried = 0;
-    imgEl.onerror = function(){
-      tried++;
-      if(tried < candidates.length) imgEl.src = candidates[tried];
-      else {
-        imgEl.src = 'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="#f3f9ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#2b7bd6" font-family="Roboto,Arial" font-size="20">Brak obrazka</text></svg>`);
-        imgEl.onerror=null;
-      }
-    };
-    imgEl.src = candidates[0];
-  }
+  function tryImageSources(imgEl, index){ if(!imgEl) return; const candidates = [ `zdjęcie_${index+1}.png`, `zdjecie_${index+1}.png`, `zdjecie-${index+1}.png`, `images/zdjęcie_${index+1}.png`, `images/zdjecie_${index+1}.png` ]; let tried = 0; imgEl.onerror = function(){ tried++; if(tried < candidates.length) imgEl.src = candidates[tried]; else { imgEl.src = 'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300"><rect width="100%" height="100%" fill="#f3f9ff"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#2b7bd6" font-family="Roboto,Arial" font-size="20">Brak obrazka</text></svg>`); imgEl.onerror=null; } }; imgEl.src = candidates[0]; }
 
   function showPlaceholder(){ if(centralImg) centralImg.style.display='none'; if(placeholderText) placeholderText.style.display='block'; if(previewEl) previewEl.classList.remove('show-overlay'); }
   function showImage(idx){ if(!centralImg) return; tryImageSources(centralImg, idx); centralImg.alt = `Czekoladka ${idx+1}`; centralImg.style.display='block'; if(placeholderText) placeholderText.style.display='none'; if(!discovered[idx]){ centralImg.classList.add('dimmed'); if(previewEl) previewEl.classList.add('show-overlay'); } else { centralImg.classList.remove('dimmed'); if(previewEl) previewEl.classList.remove('show-overlay'); } }
@@ -832,48 +523,18 @@ try{
   function updateDrawCooldownUI(){ try{ const sec = secondsUntilNextDraw(); if(drawCountdownEl){ if(sec>0){ drawCountdownEl.textContent = formatHMS(sec); if(drawBtn){ drawBtn.textContent='Już losowałeś dziś'; drawBtn.disabled=true; drawBtn.classList.add('inactive'); } } else { drawCountdownEl.textContent='Możesz losować'; if(drawBtn){ drawBtn.textContent='Wylosuj'; drawBtn.disabled=false; drawBtn.classList.remove('inactive'); } } } }catch(e){} }
 
   let shuffleInterval = null; let isShuffling = false;
+  const NEW_PROB = 0.76;
+  function pickFinalIndex(){ const undiscoveredIdx = []; const discoveredIdx = []; for(let i = 0; i < ITEMS_COUNT; i++){ if(discovered[i]) discoveredIdx.push(i); else undiscoveredIdx.push(i); } const chooseNew = Math.random() < NEW_PROB; if(chooseNew && undiscoveredIdx.length > 0){ return undiscoveredIdx[randomInt(undiscoveredIdx.length)]; } if(!chooseNew && discoveredIdx.length > 0){ return discoveredIdx[randomInt(discoveredIdx.length)]; } if(undiscoveredIdx.length > 0) return undiscoveredIdx[randomInt(undiscoveredIdx.length)]; if(discoveredIdx.length > 0) return discoveredIdx[randomInt(discoveredIdx.length)]; return randomInt(ITEMS_COUNT); }
 
-  const NEW_PROB = 0.76; // 76% na nową, 24% na już odkrytą
-  function pickFinalIndex(){
-    const undiscoveredIdx = [];
-    const discoveredIdx = [];
-    for(let i = 0; i < ITEMS_COUNT; i++){
-      if(discovered[i]) discoveredIdx.push(i);
-      else undiscoveredIdx.push(i);
-    }
-
-    const chooseNew = Math.random() < NEW_PROB;
-
-    if(chooseNew && undiscoveredIdx.length > 0){
-      return undiscoveredIdx[randomInt(undiscoveredIdx.length)];
-    }
-
-    if(!chooseNew && discoveredIdx.length > 0){
-      return discoveredIdx[randomInt(discoveredIdx.length)];
-    }
-
-    if(undiscoveredIdx.length > 0) return undiscoveredIdx[randomInt(undiscoveredIdx.length)];
-    if(discoveredIdx.length > 0) return discoveredIdx[randomInt(discoveredIdx.length)];
-    return randomInt(ITEMS_COUNT);
-  }
-
-  function startShuffle(duration=1400){
-    if(isShuffling) return;
-    isShuffling = true;
-    if(drawBtn){ drawBtn.disabled = true; drawBtn.classList.add('inactive'); drawBtn.textContent = 'Losuję…'; }
+  function startShuffle(duration=1400){ if(isShuffling) return; isShuffling = true; if(drawBtn){ drawBtn.disabled = true; drawBtn.classList.add('inactive'); drawBtn.textContent = 'Losuję…'; }
     if(captionEl) captionEl.textContent = 'Losowanie trwa — oglądaj migawki czekoladek!';
 
-    shuffleInterval = setInterval(()=>{
-      const r=randomInt(ITEMS_COUNT);
-      showImage(r);
-      if(centralImg) centralImg.style.transform = `scale(${1+Math.random()*0.03}) rotate(${(Math.random()-0.5)*5}deg)`;
-    }, 70);
+    previewEl.classList.add('shuffling');
+    shuffleInterval = setInterval(()=>{ const r=randomInt(ITEMS_COUNT); showImage(r); if(centralImg) centralImg.style.transform = `scale(${1+Math.random()*0.03}) rotate(${(Math.random()-0.5)*6}deg)`; }, 70);
 
     setTimeout(()=>{
       clearInterval(shuffleInterval); shuffleInterval=null;
-
       const final = pickFinalIndex();
-
       showImage(final);
       if(centralImg) centralImg.style.transform = 'scale(1) rotate(0deg)';
       if(centralImg) centralImg.classList.add('dimmed');
@@ -886,18 +547,9 @@ try{
         if(centralImg) centralImg.classList.remove('dimmed');
         if(captionEl) captionEl.textContent = captions[final] || '';
 
-        if(!discovered[final]){
-          discovered[final] = true;
-          saveDiscovered();
-          renderGrid();
-        }
+        if(!discovered[final]){ discovered[final] = true; saveDiscovered(); renderGrid(); }
 
-        lastDraw = new Date();
-        lastIndex = final;
-        saveLastDraw(lastDraw);
-        saveLastIndex(final);
-        updateDrawCooldownUI();
-        isShuffling = false;
+        lastDraw = new Date(); lastIndex = final; saveLastDraw(lastDraw); saveLastIndex(final); updateDrawCooldownUI(); isShuffling = false; previewEl.classList.remove('shuffling');
       }, REVEAL_DELAY);
 
     }, duration);
@@ -923,153 +575,48 @@ try{
     "Czekoladowy pingwinek – Spróbuj opowiedzieć pod koniec dnia Panu Jezusowi o swoim dniu.",
     "Maryja – odmów 10 różańca i ofiaruj ją w dowolnej intencji."
   ];
-  const names = captions.map(c=>{
-    // rozbijamy po dłuższym myślniku (–) lub krótszym (-) na wszelki wypadku
-    if(c.indexOf('–') !== -1) return c.split('–')[0].trim();
-    if(c.indexOf('-') !== -1) return c.split('-')[0].trim();
-    return c;
-  });
+  const names = captions.map(c=>{ if(c.indexOf('–') !== -1) return c.split('–')[0].trim(); if(c.indexOf('-') !== -1) return c.split('-')[0].trim(); return c; });
 
-  function renderGrid(){ try{
-    if(!modalBody) return;
-    modalBody.innerHTML='';
-    const grid = document.createElement('div'); grid.className='grid';
-    for(let idx=0; idx<ITEMS_COUNT; idx++){
-      const item = document.createElement('div'); item.className='cardItem'; item.setAttribute('data-index', idx);
-      const imgWrap = document.createElement('div'); imgWrap.className='imgWrap';
-      const img = document.createElement('img'); tryImageSources(img, idx); img.alt = names[idx] || `Czekoladka ${idx+1}`;
-      const overlay = document.createElement('div'); overlay.className='overlay'; overlay.setAttribute('aria-hidden','true'); overlay.textContent='?';
-      imgWrap.appendChild(img); imgWrap.appendChild(overlay);
-      const name = document.createElement('div'); name.className='name'; name.textContent = discovered[idx] ? names[idx] : '???';
-      const desc = document.createElement('div'); desc.className='desc'; desc.textContent = discovered[idx] ? captions[idx] : 'Odkryj tę czekoladkę, aby poznać misję.';
-      if(!discovered[idx]) item.classList.add('dimmed');
-      item.appendChild(imgWrap); item.appendChild(name); item.appendChild(desc);
-      item.addEventListener('click', ()=>{ showImage(idx); captionEl.textContent = discovered[idx] ? captions[idx] : 'Wciąż możesz odkryć tę czekoladkę ponownie.'; lastIndex=idx; saveLastIndex(idx); if(modalBackdrop) { modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } });
-      grid.appendChild(item);
-    }
-    modalBody.appendChild(grid);
-    if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length;
-    updateProgress();
-  }catch(e){ console.error('renderGrid error', e); } }
+  function renderGrid(){ try{ if(!modalBody) return; modalBody.innerHTML=''; const grid = document.createElement('div'); grid.className='grid'; for(let idx=0; idx<ITEMS_COUNT; idx++){ const item = document.createElement('div'); item.className='cardItem'; item.setAttribute('data-index', idx); const imgWrap = document.createElement('div'); imgWrap.className='imgWrap'; const img = document.createElement('img'); tryImageSources(img, idx); img.alt = names[idx] || `Czekoladka ${idx+1}`; const overlay = document.createElement('div'); overlay.className='overlay'; overlay.setAttribute('aria-hidden','true'); overlay.textContent='?'; imgWrap.appendChild(img); imgWrap.appendChild(overlay); const name = document.createElement('div'); name.className='name'; name.textContent = discovered[idx] ? names[idx] : '???'; const desc = document.createElement('div'); desc.className='desc'; desc.textContent = discovered[idx] ? captions[idx] : 'Odkryj tę czekoladkę, aby poznać misję.'; if(!discovered[idx]) item.classList.add('dimmed'); item.appendChild(imgWrap); item.appendChild(name); item.appendChild(desc); item.addEventListener('click', ()=>{ showImage(idx); captionEl.textContent = discovered[idx] ? captions[idx] : 'Wciąż możesz odkryć tę czekoladkę ponownie.'; lastIndex=idx; saveLastIndex(idx); if(modalBackdrop) { modal.classList.remove('short-modal'); modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); } }); grid.appendChild(item); }
+      modalBody.appendChild(grid);
+      // pokaż modal z animacją
+      if(modal){ modal.classList.add('show'); }
+      if(modalBackdrop){ modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); }
+
+      // stagerowane odtwarzanie animacji dla elementów
+      const cards = grid.querySelectorAll('.cardItem');
+      cards.forEach((c,i)=>{ setTimeout(()=>{ c.classList.add('revealed'); }, i*80); });
+
+      if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length; updateProgress(); }catch(e){ console.error('renderGrid error', e); } }
 
   function updateProgress(){ try{ const found = discovered.filter(Boolean).length; const bar = document.getElementById('progressBar'); const pctEl = document.getElementById('progressPct'); const foundEl = document.getElementById('foundCount'); if(foundEl) foundEl.textContent = found; if(bar) bar.style.width = '0%'; if(pctEl) pctEl.textContent = ''; if(bar) bar.setAttribute('aria-valuenow', '0'); }catch(e){/*silent*/} }
 
   window.addEventListener('resize', ()=>{});
 
   if(drawBtn){ drawBtn.addEventListener('click', ()=>{ try{ if(secondsUntilNextDraw()>0){ updateDrawCooldownUI(); return; } startShuffle(1400); }catch(e){} }); }
-  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modal.classList.add('short-modal'); modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); } }catch(e){} }); }
-  if(closeModal){ closeModal.addEventListener('click', ()=>{ if(modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } }); }
-  if(modalBackdrop){ modalBackdrop.addEventListener('click',(e)=>{ if(e.target===modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } }); }
+  if(openBook){ openBook.addEventListener('click', ()=>{ try{ renderGrid(); if(modalBackdrop){ modal.classList.add('short-modal'); modal.classList.add('show'); modalBackdrop.classList.add('show'); modalBackdrop.setAttribute('aria-hidden','false'); } }catch(e){} }); }
+  if(closeModal){ closeModal.addEventListener('click', ()=>{ if(modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); modal.classList.remove('show'); } }); }
+  if(modalBackdrop){ modalBackdrop.addEventListener('click',(e)=>{ if(e.target===modalBackdrop){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); modal.classList.remove('show'); } }); }
 
-  document.addEventListener('keydown', (e)=>{ if(modalBackdrop && modalBackdrop.classList.contains('show')){ if(e.key==='ArrowDown') modalBody.scrollBy({top:120,behavior:'smooth'}); if(e.key==='ArrowUp') modalBody.scrollBy({top:-120,behavior:'smooth'}); if(e.key==='PageDown') modalBody.scrollBy({top: modalBody.clientHeight, behavior:'smooth'}); if(e.key==='PageUp') modalBody.scrollBy({top:-modalBody.clientHeight,behavior:'smooth'}); if(e.key==='Escape'){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); } } });
+  document.addEventListener('keydown', (e)=>{ if(modalBackdrop && modalBackdrop.classList.contains('show')){ if(e.key==='ArrowDown') modalBody.scrollBy({top:120,behavior:'smooth'}); if(e.key==='ArrowUp') modalBody.scrollBy({top:-120,behavior:'smooth'}); if(e.key==='PageDown') modalBody.scrollBy({top: modalBody.clientHeight, behavior:'smooth'}); if(e.key==='PageUp') modalBody.scrollBy({top:-modalBody.clientHeight,behavior:'smooth'}); if(e.key==='Escape'){ modalBackdrop.classList.remove('show'); modalBackdrop.setAttribute('aria-hidden','true'); modal.classList.remove('short-modal'); modal.classList.remove('show'); } } });
 
-  (function init(){
-    try{
-      discovered = loadDiscovered();
-      lastDraw = loadLastDraw();
-      lastIndex = loadLastIndex();
-
-      if(Number.isInteger(lastIndex) && lastIndex>=0 && lastIndex<ITEMS_COUNT){ showImage(lastIndex); if(captionEl) captionEl.textContent = discovered[lastIndex] ? captions[lastIndex] : 'Wciąż możesz odkryć tę czekoladkę ponownie.'; }
-      else showPlaceholder();
-
-      updateDec24(); updateDrawCooldownUI(); setInterval(updateDec24,1000); setInterval(updateDrawCooldownUI,1000);
-      if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length;
-      updateProgress();
-
-      loadSavedTheme();
-      updateSettingsBtnColor();
-      // upewnij się, że ikona ma ustawioną widoczność na starcie
-      if(settingsIcon) settingsIcon.style.opacity = '1';
-    }catch(e){ console.error('init error', e); }
-  })();
+  (function init(){ try{ discovered = loadDiscovered(); lastDraw = loadLastDraw(); lastIndex = loadLastIndex(); if(Number.isInteger(lastIndex) && lastIndex>=0 && lastIndex<ITEMS_COUNT){ showImage(lastIndex); if(captionEl) captionEl.textContent = discovered[lastIndex] ? captions[lastIndex] : 'Wciąż możesz odkryć tę czekoladkę ponownie.'; } else showPlaceholder(); updateDec24(); updateDrawCooldownUI(); setInterval(updateDec24,1000); setInterval(updateDrawCooldownUI,1000); if(foundCountEl) foundCountEl.textContent = discovered.filter(Boolean).length; updateProgress(); loadSavedTheme(); updateSettingsBtnColor(); if(settingsIcon) settingsIcon.style.opacity = '1';
+      // delikatne usunięcie klas animacji startowej po odtworzeniu (by móc je później ponownie odpalić)
+      setTimeout(()=>{ document.querySelectorAll('.start-anim').forEach(el=>el.classList.remove('start-anim')); }, 700);
+    }catch(e){ console.error('init error', e); } })();
 
   (function(){
     const ONBOARD_KEY = 'sg_onboard_v1';
     const FIRST_DRAW_SHOWN_KEY = 'sg_first_draw_shown_v1';
-    function createOverlay(msg, opts){
-      opts = opts || {};
-      const wrap = document.createElement('div');
-      wrap.setAttribute('role','dialog');
-      wrap.setAttribute('aria-modal','true');
-      wrap.className = 'sg-onboard-overlay';
-      Object.assign(wrap.style,{ position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center', zIndex:4000, background:'transparent', padding:'20px' });
-
-      const box = document.createElement('div');
-      box.style.maxWidth = '360px';
-      box.style.width = 'min(86vw, 360px)';
-      box.style.height = 'auto';
-      box.style.borderRadius = '12px';
-      box.style.padding = '12px 14px';
-      box.style.boxSizing = 'border-box';
-      box.style.background = 'rgba(255,255,255,0.06)';
-      box.style.border = '1px solid var(--glass-border)';
-      box.style.backdropFilter = 'blur(18px) saturate(120%)';
-      box.style.webkitBackdropFilter = 'blur(18px) saturate(120%)';
-      box.style.color = 'var(--navy)';
-      box.style.boxShadow = '0 12px 30px rgba(2,6,23,0.16)';
-      box.style.display = 'flex';
-      box.style.flexDirection = 'column';
-      box.style.gap = '10px';
-      box.style.justifyContent = 'center';
-      box.style.overflow = 'visible';
-
-      const emoji = document.createElement('div');
-      emoji.textContent = opts.emoji || '🎄';
-      emoji.style.fontSize = '26px';
-      emoji.style.textAlign = 'center';
-
+    function createOverlay(msg, opts){ opts = opts || {}; const wrap = document.createElement('div'); wrap.setAttribute('role','dialog'); wrap.setAttribute('aria-modal','true'); wrap.className = 'sg-onboard-overlay'; Object.assign(wrap.style,{ position:'fixed', inset:0, display:'flex', alignItems:'center', justifyContent:'center', zIndex:4000, background:'transparent', padding:'20px' });
+      const box = document.createElement('div'); box.style.maxWidth = '360px'; box.style.width = 'min(86vw, 360px)'; box.style.height = 'auto'; box.style.borderRadius = '12px'; box.style.padding = '12px 14px'; box.style.boxSizing = 'border-box'; box.style.background = 'rgba(255,255,255,0.06)'; box.style.border = '1px solid var(--glass-border)'; box.style.backdropFilter = 'blur(18px) saturate(120%)'; box.style.webkitBackdropFilter = 'blur(18px) saturate(120%)'; box.style.color = 'var(--body-text)'; box.style.boxShadow = '0 12px 30px rgba(2,6,23,0.16)'; box.style.display = 'flex'; box.style.flexDirection = 'column'; box.style.gap = '10px'; box.style.justifyContent = 'center'; box.style.overflow = 'visible';
+      const emoji = document.createElement('div'); emoji.textContent = opts.emoji || '🎄'; emoji.style.fontSize = '26px'; emoji.style.textAlign = 'center';
       const p = document.createElement('div'); p.style.fontSize='15px'; p.style.lineHeight='1.45'; p.style.margin='0'; p.innerHTML = msg;
       const btn = document.createElement('button'); btn.textContent = 'OK'; btn.className = 'small-btn ghost'; btn.style.alignSelf='center'; btn.style.padding='8px 12px'; btn.style.borderRadius='10px'; btn.style.fontWeight='700'; btn.style.cursor='pointer';
-
-      box.appendChild(emoji);
-      box.appendChild(p);
-      box.appendChild(btn);
-      wrap.appendChild(box);
-      return {wrap, btn, box, p};
-    }function runOnboardingSequence(){
-      try{
-        if(safeGet(ONBOARD_KEY)) return;
-        const steps = [
-          '🎄 Witaj w "Serce Gotowe" — dzięki której lepiej przygotujesz się na przyjście Pana Jezusa!',
-          '🎁 Serce Gotowe to twój wirtualny kalendarz adwentowy — do zdobycia jest aż 18 unikatowych czekoladek!',
-          '✨ Odkryj 18 misji, zdobądź i wykonaj wszystkie przed 24 grudnia, aby spełnić Świąteczne Wyzwanie! Co 24 godziny losuj czekoladkę — naciśnij "Wylosuj!"'
-        ];
-
-        let idx = 0;
-        const {wrap, btn, p} = createOverlay(steps[idx]);
-        document.body.appendChild(wrap);
-        btn.focus();
-        btn.addEventListener('click', function handler(){
-          idx++;
-          if(idx < steps.length){ p.innerHTML = steps[idx]; return; }
-          document.body.removeChild(wrap);
-          try{ safeSet(ONBOARD_KEY, '1'); }catch(e){}
-        });
-      }catch(e){ console.error('onboarding error', e); }
-    }
+      box.appendChild(emoji); box.appendChild(p); box.appendChild(btn); wrap.appendChild(box); return {wrap, btn, box, p}; }
+    function runOnboardingSequence(){ try{ if(safeGet(ONBOARD_KEY)) return; const steps = [ '🎄 Witaj w "Serce Gotowe" — dzięki której lepiej przygotujesz się na przyjście Pana Jezusa!', '🎁 Serce Gotowe to twój wirtualny kalendarz adwentowy — do zdobycia jest aż 18 unikatowych czekoladek!', '✨ Odkryj 18 misji, zdobądź i wykonaj wszystkie przed 24 grudnia, aby spełnić Świąteczne Wyzwanie! Co 24 godziny losuj czekoladkę — naciśnij "Wylosuj!"' ]; let idx = 0; const {wrap, btn, p} = createOverlay(steps[idx]); document.body.appendChild(wrap); btn.focus(); btn.addEventListener('click', function handler(){ idx++; if(idx < steps.length){ p.innerHTML = steps[idx]; return; } document.body.removeChild(wrap); try{ safeSet(ONBOARD_KEY, '1'); }catch(e){} }); }catch(e){ console.error('onboarding error', e); } }
     try{ runOnboardingSequence(); }catch(e){}
-    (function watchFirstDraw(){
-      try{
-        let prev = safeGet(LAST_KEY);
-        const check = function(){
-          const now = safeGet(LAST_KEY);
-          const onboardDone = !!safeGet(ONBOARD_KEY);
-          const firstShown = !!safeGet(FIRST_DRAW_SHOWN_KEY);
-          if(onboardDone && !firstShown && now && now !== prev){
-            prev = now;
-            setTimeout(()=>{
-              try{
-                const msg = 'O to twoja pierwsza czekoladka! Wszystkie które zdobyłeś/aś możesz podglądnąć w Księdze Czekoladek! Są tam także te do odblokowania! Możesz także dostosować swoją Aplikację po swojemu, naciskając ikonkę ustawień! POWODZENIA!';
-                const {wrap, btn} = createOverlay(msg);
-                document.body.appendChild(wrap);
-                btn.focus();
-                btn.addEventListener('click', ()=>{ try{ document.body.removeChild(wrap); safeSet(FIRST_DRAW_SHOWN_KEY,'1'); }catch(e){} });
-              }catch(e){ console.error('first-draw message error', e); }
-            }, 1500);
-          } else {
-            prev = now;
-          }
-        };
+    (function watchFirstDraw(){ try{ let prev = safeGet(LAST_KEY); const check = function(){ const now = safeGet(LAST_KEY); const onboardDone = !!safeGet(ONBOARD_KEY); const firstShown = !!safeGet(FIRST_DRAW_SHOWN_KEY); if(onboardDone && !firstShown && now && now !== prev){ prev = now; setTimeout(()=>{ try{ const msg = 'O to twoja pierwsza czekoladka! Wszystkie które zdobyłeś/aś możesz podglądnąć w Księdze Czekoladek! Są tam także te do odblokowania! Możesz także dostosować swoją Aplikację po swojemu, naciskając ikonkę ustawień! POWODZENIA!'; const {wrap, btn} = createOverlay(msg); document.body.appendChild(wrap); btn.focus(); btn.addEventListener('click', ()=>{ try{ document.body.removeChild(wrap); safeSet(FIRST_DRAW_SHOWN_KEY,'1'); }catch(e){} }); }catch(e){ console.error('first-draw message error', e); } }, 1500); } else { prev = now; } };
         const poll = setInterval(check, 700);
         window.addEventListener('beforeunload', ()=>{ clearInterval(poll); });
       }catch(e){ console.error('watchFirstDraw error', e); }
@@ -1083,6 +630,8 @@ try{
 </script>
 </body>
 </html>
+
+
 
 
 
